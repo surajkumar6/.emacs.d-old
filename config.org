@@ -1,0 +1,299 @@
+#+TITLE: Emacs configuration
+
+* Use sensible defaults
+* Set personal info
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Suraj Kumar Reddy"
+        user-mail-address "abc@suraj.com"
+        calendar-latitude 17.3
+        calendar-longitude -78.4
+        calendar-location-name "Hyderabad, IND")
+#+END_SRC
+* Add =resources= to =load-path=
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/resources/")
+#+END_SRC
+* Package management
+
+#+BEGIN_SRC emacs-lisp
+  (package-initialize)
+
+  (let ((default-directory "~/.emacs.d"))
+    (normal-top-level-add-subdirs-to-load-path))
+    (require 'package)
+
+  (defvar my-packages
+    '(better-defaults
+      elpy;; python package
+      flycheck;; on the fly syntax checking
+      py-autopep8;; Python pep8 support
+      magit;; git support
+      rainbow-delimiters
+      solarized-theme;; theme
+      doom-themes
+      all-the-icons
+      neotree
+      ))
+
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/"))
+
+  (when (not package-archive-contents)
+    (package-refresh-contents))
+  (package-initialize)
+
+  (dolist (p my-packages)
+    (when (not (package-installed-p p))
+      (package-install p)))
+#+END_SRC
+* UI Preferences
+** Enable line numbers globally
+
+#+BEGIN_SRC emacs-lisp
+  (global-linum-mode t)
+#+END_SRC
+** Enable rainbow delimeters
+Rainbow delimeters show matching braces as color pairs
+
+#+BEGIN_SRC emacs-lisp
+  (require 'rainbow-delimiters)
+#+END_SRC
+** Enable all-the-icons pack
+A collection of icons and fonts(mainly used for neotree)
+
+#+BEGIN_SRC emacs-lisp
+  (require 'all-the-icons)
+#+END_SRC
+** Theme config
+*** Set theme
+
+#+BEGIN_SRC emacs-lisp
+  (require 'doom-themes)
+#+END_SRC
+*** Theme settings
+Disable bolding universally
+
+#+BEGIN_SRC emacs-lisp
+  (setq doom-enable-bold nil)
+#+END_SRC
+
+Disable italics universally
+
+#+BEGIN_SRC emacs-lisp
+  (setq doom-enable-italic nil)
+#+END_SRC
+
+Enable brighter mode line
+
+#+BEGIN_SRC emacs-lisp
+  (setq doom-one-brighter-modeline t)
+#+END_SRC
+
+Enable brighter comments
+
+#+BEGIN_SRC emacs-lisp
+  (setq doom-one-brighter-comments t)
+#+END_SRC
+
+Load the dark version of the theme
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'doom-one t)
+#+END_SRC
+* Set default font and configure font resizing
+I use Consolas
+
+The standard =text-scale-= functions just resize the text in the
+current buffer. These functions and bindings resize everything all
+together.
+
+#+BEGIN_SRC emacs-lisp
+  (setq sk/default-font "Consolas")
+  (setq sk/default-font-size 13)
+  (setq sk/current-font-size sk/default-font-size)
+
+  (setq sk/font-change-increment 1.1)
+
+  (defun sk/set-font-size ()
+    "Set the font to `sk/default-font' at `sk/current-font-size'."
+    (set-frame-font
+     (concat sk/default-font "-" (number-to-string sk/current-font-size))))
+
+  (defun sk/reset-font-size ()
+    "Change font size back to `sk/default-font-size'."
+    (interactive)
+    (setq sk/current-font-size sk/default-font-size)
+    (sk/set-font-size))
+
+  (defun sk/increase-font-size ()
+    "Increase current font size by a factor of `sk/font-change-increment'."
+    (interactive)
+    (setq sk/current-font-size
+          (ceiling (* sk/current-font-size sk/font-change-increment)))
+    (sk/set-font-size))
+
+  (defun sk/decrease-font-size ()
+    "Decrease current font size by a factor of `sk/font-change-increment', down to a minimum size of 1."
+    (interactive)
+    (setq sk/current-font-size
+          (max 1
+               (floor (/ sk/current-font-size sk/font-change-increment))))
+    (sk/set-font-size))
+
+  (define-key global-map (kbd "C-)") 'sk/reset-font-size)
+  (define-key global-map (kbd "C-+") 'sk/increase-font-size)
+  (define-key global-map (kbd "C-=") 'sk/increase-font-size)
+  (define-key global-map (kbd "C-_") 'sk/decrease-font-size)
+  (define-key global-map (kbd "C--") 'sk/decrease-font-size)
+
+  (sk/reset-font-size)
+#+END_SRC
+* Enable better defaults
+
+#+BEGIN_SRC emacs-lisp
+  (require 'better-defaults)
+#+END_SRC
+* Org-mode config
+** Enable org-bullets
+Show bulleted list intead of just asterisks
+
+#+BEGIN_SRC emacs-lisp
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+** Org levels color customization
+
+#+BEGIN_SRC emacs-lisp
+  (custom-theme-set-faces 'doom-one
+   '(org-level-1 ((t (:background "#23272e" :foreground "#da8548" :weight normal))))
+   '(org-level-2 ((t (:foreground "#98be65"))))
+   '(org-level-3 ((t (:foreground "#a9a1e1"))))
+   '(org-level-4 ((t (:foreground "#ECBE7B"))))
+   '(org-level-5 ((t (:foreground "#4db5bd"))))
+   '(org-link ((t (:foreground "DarkOrchid1" :underline t)))))
+#+END_SRC
+** Theme specific settings
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t)
+#+END_SRC
+** Others
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis "↴")
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
+* Neotree config
+Enable neotree and set a global key binding
+
+#+BEGIN_SRC emacs-lisp
+  (require 'neotree)
+  (global-set-key [f8] 'neotree-toggle)
+#+END_SRC
+
+Use pretty icons for files and folders
+
+#+BEGIN_SRC emacs-lisp
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+#+END_SRC
+
+Enable doom-theme for neotree
+
+#+BEGIN_SRC emacs-lisp
+  (require 'doom-neotree)
+#+END_SRC
+* Programming preferences
+Enable global =flycheck-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (global-flycheck-mode)
+#+END_SRC
+
+Enable =rainbow-delimeters-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+#+END_SRC
+
+Delete trailing white spaces before saving a file
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+Treat terms in camel case as seprate words globally
+
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
+#+END_SRC
+
+** Python
+
+Enable =elpy=
+
+#+BEGIN_SRC emacs-lisp
+  (elpy-enable)
+#+END_SRC
+
+Use =flycheck= instead of =flymake= to enable on the fly syntax checking
+
+#+BEGIN_SRC emacs-lisp
+  (when (require 'flycheck nil t)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode))
+#+END_SRC
+
+Enable pep8 style
+
+#+BEGIN_SRC emacs-lisp
+  (require 'py-autopep8)
+  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+#+END_SRC
+* My custom key bindings
+
+#+BEGIN_SRC emacs-lisp
+  ;; custom key bindings
+  (global-set-key (kbd "C-x C-q") 'save-buffers-kill-terminal) ;; was C-x C-c, overrides read-only-mode
+  (global-set-key (kbd "C-;") 'set-mark-command) ;; was C-Space
+
+  ;; easy navigation
+  (global-set-key (kbd "M-i") 'previous-line) ;;
+  (global-set-key (kbd "M-j") 'backward-char) ;;
+  (global-set-key (kbd "M-k") 'next-line) ;;
+  (global-set-key (kbd "M-l") 'forward-char) ;;
+
+  (global-set-key (kbd "M-u") 'backward-word) ;;
+  (global-set-key (kbd "M-o") 'forward-word) ;;
+  (global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+* Utility functions
+** Insert current date and time
+
+#+BEGIN_SRC emacs-lisp
+  (defvar current-date-time-format "%d-%b-%Y %k:%M"
+    "Format of date to insert with `insert-current-date-time' func See help of `format-time-string' for possible replacements")
+
+  (defvar current-time-format "%k:%M:%S"
+    "Format of date to insert with `insert-current-time' func.Note the weekly scope of the command's precision.")
+
+  (defun insert-current-date-time ()
+    "insert the current date and time into current buffer.Uses `current-date-time-format' for the formatting the date/time."
+         (interactive)
+         (insert (format-time-string current-date-time-format (current-time)))
+         )
+
+  (defun insert-current-time ()
+    "insert the current time (1-week scope) into the current buffer."
+         (interactive)
+         (insert (format-time-string current-time-format (current-time)))
+         )
+
+  (global-set-key (kbd "C-x C-d") 'insert-current-date-time)
+  (global-set-key (kbd "C-x C-t") 'insert-current-time)
+#+END_SRC

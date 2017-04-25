@@ -1,0 +1,8 @@
+/auto-save-list
+/backups
+/elpa
+/server
+/url
+*.last
+*.el~
+config.el
