@@ -1,6 +1,14 @@
 #+TITLE: Emacs configuration
 
 * Use sensible defaults
+  Use [[https://github.com/surajkumar6/emacs-config/blob/master/resources/sensible-defaults.el][sensible-defaults.el]] for some basic settings
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/resources/sensible-defaults.el")
+  (sensible-defaults/use-all-settings)
+  (sensible-defaults/use-all-keybindings)
+  (sensible-defaults/backup-to-temp-directory)
+#+END_SRC
 * Set personal info
 
 #+BEGIN_SRC emacs-lisp
