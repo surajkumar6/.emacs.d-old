@@ -18,49 +18,33 @@
         calendar-longitude -78.4
         calendar-location-name "Hyderabad, IND")
 #+END_SRC
-* Add =resources= to =load-path=
-
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/resources/")
-#+END_SRC
 * Package management
-
 #+BEGIN_SRC emacs-lisp
-  (package-initialize)
+    (let ((default-directory "~/.emacs.d"))
+      (normal-top-level-add-subdirs-to-load-path))
+      (require 'package)
 
-  (let ((default-directory "~/.emacs.d"))
-    (normal-top-level-add-subdirs-to-load-path))
-    (require 'package)
+    (defvar my-packages
+      '(
+        use-package
+        diminish
+        bind-key
+        ))
 
-  (defvar my-packages
-    '(better-defaults
-      elpy ;; python package
-      flycheck ;; on the fly syntax checking
-      py-autopep8 ;; Python pep8 support
-      magit ;; git support
-      rainbow-delimiters ;; show matching paranthesis in paired colors
-      doom-themes
-      all-the-icons ;;  icons and font pack
-      neotree ;; folder navigation side-bar
-      projectile ;; project management
-      page-break-lines
-      dashboard ;; startup dashboard
-      smartparens ;; auto fill matching parenthesis
-      helm ;; incremental completion and selection narrowing framework
-      helm-projectile ;; helm and projectile integration
-      helm-swoop ;; better search
-      ))
+    (add-to-list 'package-archives
+                 '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
-  (add-to-list 'package-archives
-               '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+    (when (not package-archive-contents)
+      (package-refresh-contents))
+    (package-initialize)
 
-  (when (not package-archive-contents)
-    (package-refresh-contents))
-  (package-initialize)
+    (dolist (p my-packages)
+      (when (not (package-installed-p p))
+        (package-install p)))
 
-  (dolist (p my-packages)
-    (when (not (package-installed-p p))
-      (package-install p)))
+  (require 'use-package)
+  (require 'diminish)                ;; if you use :diminish
+  (require 'bind-key)
 #+END_SRC
 * UI Preferences
 ** Disable toolbars and menus
@@ -86,72 +70,64 @@
 #+BEGIN_SRC emacs-lisp
   (global-linum-mode t)
 #+END_SRC
-** Enable rainbow delimeters
+* Enable rainbow delimeters
 Rainbow delimeters show matching braces as color pairs
 
 #+BEGIN_SRC emacs-lisp
-  (require 'rainbow-delimiters)
+  (use-package rainbow-delimiters
+    :ensure t
+    :defer t
+    :init
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+    :config
+    (message "rainbow-delimeters loaded"))
 #+END_SRC
-** Enable all-the-icons pack
-A collection of icons and fonts(mainly used for neotree)
+* Enable all-the-icons pack
+   A collection of icons and fonts(mainly used for neotree)
 
 #+BEGIN_SRC emacs-lisp
-  (require 'all-the-icons)
+  (use-package all-the-icons
+    :ensure t
+    :defer t
+    :config
+    (message "all-the-icons loaded"))
 #+END_SRC
-** Theme config
-*** Set theme
+* Theme config
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-enable-bold nil) ;; Disable bolding universally
+    (setq doom-enable-italic nil) ;; Disable italics universally
+    (setq doom-one-brighter-modeline t) ;; Enable brighter mode line
+    (setq doom-one-brighter-comments t) ;; Enable brighter comments
+    (load-theme 'doom-one t)
+    (message "doom-theme loaded"))
+#+END_SRC
+* Load =page-break-lines=
 
 #+BEGIN_SRC emacs-lisp
-  (require 'doom-themes)
+  (use-package page-break-lines
+    :ensure t
+    :config
+    (message "page-break-lines loaded"))
 #+END_SRC
-*** Theme settings
-Disable bolding universally
+* Enable and configure startup dashboard
 
 #+BEGIN_SRC emacs-lisp
-  (setq doom-enable-bold nil)
-#+END_SRC
-
-Disable italics universally
-
-#+BEGIN_SRC emacs-lisp
-  (setq doom-enable-italic nil)
-#+END_SRC
-
-Enable brighter mode line
-
-#+BEGIN_SRC emacs-lisp
-  (setq doom-one-brighter-modeline t)
-#+END_SRC
-
-Enable brighter comments
-
-#+BEGIN_SRC emacs-lisp
-  (setq doom-one-brighter-comments t)
-#+END_SRC
-
-Load the dark version of the theme
-
-#+BEGIN_SRC emacs-lisp
-  (load-theme 'doom-one t)
-#+END_SRC
-** Load =page-break-lines=
-
-#+BEGIN_SRC emacs-lisp
-  (require 'page-break-lines)
-#+END_SRC
-** Enable and configure startup dashboard
-
-#+BEGIN_SRC emacs-lisp
-  (require 'dashboard)
-  (dashboard-setup-startup-hook)
-  ;; Set the title
-  (setq dashboard-banner-logo-title "Welcome Suraj")
-  ;; Set the banner
-  (setq dashboard-startup-banner 'logo)
-  ;; Set the number of items in each widget
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)))
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    ;; Set the title
+    (setq dashboard-banner-logo-title "Welcome Suraj")
+    ;; Set the banner
+    (setq dashboard-startup-banner 'logo)
+    ;; Set the number of items in each widget
+    (setq dashboard-items '((recents  . 5)
+                            (bookmarks . 5)
+                            (projects . 5)))
+    (message "dashboard loaded"))
 #+END_SRC
 * Set default font and configure font resizing
 I use Consolas
@@ -204,7 +180,18 @@ together.
 * Enable better defaults
 
 #+BEGIN_SRC emacs-lisp
-  (require 'better-defaults)
+  (use-package better-defaults
+    :config
+    (message "better-defaults loaded"))
+#+END_SRC
+* Projectile
+
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-global-mode)
+    (message "projectile loaded"))
 #+END_SRC
 * Org-mode config
 ** Display preferences
@@ -212,8 +199,11 @@ together.
 Show bulleted list instead of just asterisks
 
 #+BEGIN_SRC emacs-lisp
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (use-package org-bullets
+    :load-path "~/.emacs.d/resources/org-bullets.el"
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    (message "org-bullets loaded"))
 #+END_SRC
 
 Org-mode levels color customization
@@ -261,11 +251,30 @@ Enable smartparens
   (add-hook 'org-mode-hook #'smartparens-mode)
 #+END_SRC
 * Neotree config
-Enable neotree and set a global key binding
+Enable neotree and set global key bindings
 
 #+BEGIN_SRC emacs-lisp
-  (require 'neotree)
-  (global-set-key [f8] 'neotree-toggle)
+  (use-package neotree
+    :ensure t
+    :defer t
+    :config
+    (defun neotree-project-dir ()
+      "Open NeoTree using the git root."
+      (interactive)
+      (let ((project-dir (projectile-project-root))
+            (file-name (buffer-file-name)))
+        (neotree-toggle)
+        (if project-dir
+            (if (neo-global--window-exists-p)
+                (progn
+                  (neotree-dir project-dir)
+                  (neotree-find file-name)))
+          (message "Could not find git project root."))))
+    (use-package all-the-icons)
+    (message "neotree loaded")
+    :bind (
+           ([f8] . neotree-project-dir)
+           ([f7] . neotree-dir)))
 #+END_SRC
 
 Use pretty icons for files and folders
@@ -280,91 +289,64 @@ Enable doom-theme for neotree
   (require 'doom-neotree)
 #+END_SRC
 * Helm config
-** load =helm-config=
 
 #+BEGIN_SRC emacs-lisp
-  (require 'helm-config)
+  (use-package helm
+    :ensure t
+    :config
+    (require 'helm-config)
+    (helm-mode 1)
+    (message "helm loaded")
+    :bind
+    (
+     ("C-x b" . helm-mini)
+     ("C-h a" . helm-apropos)
+     ("M-y" . helm-show-kill-ring)
+     ("M-x" . helm-M-x)
+     ("C-x C-f" . helm-find-files)))
 #+END_SRC
-** General keybindings
+* =helm-projectile= config
 
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-x") #'helm-M-x)
-  (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  (use-package helm-projectile
+    :defer t
+    :ensure t
+    :config
+    (helm-projectile-on)
+    (message "helm-projectile loaded"))
 #+END_SRC
-** Enable =helm-mode=
+* =helm-swoop= config
 
 #+BEGIN_SRC emacs-lisp
-(helm-mode 1)
-#+END_SRC
-** =helm-projectile= config
-
-#+BEGIN_SRC emacs-lisp
-  (require 'helm-projectile)
-  (helm-projectile-on)
-#+END_SRC
-** =helm-swoop= config
-
-#+BEGIN_SRC emacs-lisp
-  (require 'helm)
-  (require 'helm-swoop)
-  ;; Change the keybinds to whatever you like :)
-  (global-set-key (kbd "M-s") 'helm-swoop)
-  (global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
-  (global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
-  (global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
-
-  ;; When doing isearch, hand the word over to helm-swoop
-  (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
-  ;; From helm-swoop to helm-multi-swoop-all
-  (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
-  ;; When doing evil-search, hand the word over to helm-swoop
-  ;; (define-key evil-motion-state-map (kbd "M-i") 'helm-swoop-from-evil-search)
-
-  ;; Instead of helm-multi-swoop-all, you can also use helm-multi-swoop-current-mode
-  (define-key helm-swoop-map (kbd "M-m") 'helm-multi-swoop-current-mode-from-helm-swoop)
-
-  ;; Move up and down like isearch
-  (define-key helm-swoop-map (kbd "C-r") 'helm-previous-line)
-  (define-key helm-swoop-map (kbd "C-s") 'helm-next-line)
-  (define-key helm-multi-swoop-map (kbd "C-r") 'helm-previous-line)
-  (define-key helm-multi-swoop-map (kbd "C-s") 'helm-next-line)
-
-  ;; Save buffer when helm-multi-swoop-edit complete
-  (setq helm-multi-swoop-edit-save t)
-
-  ;; If this value is t, split window inside the current window
-  (setq helm-swoop-split-with-multiple-windows nil)
-
-  ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
-  (setq helm-swoop-split-direction 'split-window-vertically)
-
-  ;; If nil, you can slightly boost invoke speed in exchange for text color
-  (setq helm-swoop-speed-or-color nil)
-
-  ;; ;; Go to the opposite side of line from the end or beginning of line
-  (setq helm-swoop-move-to-line-cycle t)
-
-  ;; Optional face for line numbers
-  ;; Face name is `helm-swoop-line-number-face`
-  (setq helm-swoop-use-line-number-face t)
-
-  ;; If you prefer fuzzy matching
-  (setq helm-swoop-use-fuzzy-match t)
+  (use-package helm-swoop
+    :ensure t
+    :defer t
+    :config
+    (use-package helm)
+    ;; Save buffer when helm-multi-swoop-edit complete
+    (setq helm-multi-swoop-edit-save t)
+    ;; If this value is t, split window inside the current window
+    (setq helm-swoop-split-with-multiple-windows nil)
+    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+    (setq helm-swoop-split-direction 'split-window-vertically)
+    ;; If nil, you can slightly boost invoke speed in exchange for text color
+    (setq helm-swoop-speed-or-color nil)
+    ;; ;; Go to the opposite side of line from the end or beginning of line
+    (setq helm-swoop-move-to-line-cycle t)
+    ;; Optional face for line numbers
+    ;; Face name is `helm-swoop-line-number-face`
+    (setq helm-swoop-use-line-number-face t)
+    ;; If you prefer fuzzy matching
+    (setq helm-swoop-use-fuzzy-match t)
+    (message "helm-swoop loaded")
+    :bind(
+          ("M-s" . helm-swoop)
+          ("M-I" . helm-swoop-back-to-last-point)
+          ("C-c M-i" . helm-multi-swoop)
+          ("C-x M-i" . helm-multi-swoop-all)))
 #+END_SRC
 * Programming preferences
 ** General preferences
-Enable global =flycheck-mode=
-
-#+BEGIN_SRC emacs-lisp
-  (global-flycheck-mode)
-#+END_SRC
-
-Enable =rainbow-delimeters-mode=
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-#+END_SRC
 
 Delete trailing white spaces before saving a file
 
@@ -378,38 +360,50 @@ Treat terms in camel case as seprate words globally
   (global-subword-mode 1)
 #+END_SRC
 
-Load default =smartparens= config
+*** Load default =smartparens= config
 
 #+BEGIN_SRC emacs-lisp
-  (require 'smartparens-config)
+  (use-package smartparens
+    :ensure t
+    :defer t
+    :config
+    (require 'smartparens-config)
+    (message "loaded smartparens"))
 #+END_SRC
-** Python
-
-Enable =elpy=
+* Enable =elpy=
 
 #+BEGIN_SRC emacs-lisp
-  (elpy-enable)
-#+END_SRC
-
-Use =flycheck= instead of =flymake= to enable on the fly syntax checking
-
-#+BEGIN_SRC emacs-lisp
-  (when (require 'flycheck nil t)
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'flycheck-mode))
-#+END_SRC
-
-Enable pep8 style
-
-#+BEGIN_SRC emacs-lisp
-  (require 'py-autopep8)
-  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+  (use-package elpy
+    :ensure t
+    :defer t
+    :init
+    (add-hook 'python-mode-hook 'elpy-mode)
+    :config
+    (elpy-enable)
+    (when (require 'flycheck nil t)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (use-package py-autopep8
+      :ensure t
+      :config
+      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+      (message "py-autopep8 loaded"))
+      (message "elpy loaded"))
 #+END_SRC
 
 Indent 2 spaces
 
 #+BEGIN_SRC emacs-lisp
   (setq python-indent 2)
+#+END_SRC
+* Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :defer t
+    :config
+    (global-flycheck-mode)
+    (message "flycheck loaded"))
 #+END_SRC
 * My custom key bindings
 
@@ -426,7 +420,6 @@ Indent 2 spaces
 
   (global-set-key (kbd "M-u") 'backward-word) ;;
   (global-set-key (kbd "M-o") 'forward-word) ;;
-  (global-set-key (kbd "C-x g") 'magit-status)
 #+END_SRC
 * Utility functions
 ** Insert current date and time
@@ -454,11 +447,6 @@ Indent 2 spaces
   (global-set-key (kbd "C-x C-t") 'insert-current-time)
 #+END_SRC
 * Editing settings
-** Enable global projectile mode
-
-#+BEGIN_SRC emacs-lisp
-(projectile-global-mode)
-#+END_SRC
 ** Always kill current buffer
 
 #+BEGIN_SRC emacs-lisp
@@ -477,4 +465,21 @@ Indent 2 spaces
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
+#+END_SRC
+* Magit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :defer t
+    :config
+    (message "magit loaded")
+    :bind (
+           ("C-x g" . magit-status)))
+#+END_SRC
+* Set =custom-file= location
+
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file 'noerror)
 #+END_SRC
