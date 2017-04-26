@@ -205,15 +205,16 @@ together.
   (require 'better-defaults)
 #+END_SRC
 * Org-mode config
-** Enable org-bullets
-Show bulleted list intead of just asterisks
+** Display preferences
+
+Show bulleted list instead of just asterisks
 
 #+BEGIN_SRC emacs-lisp
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+END_SRC
-** Org levels color customization
 
+Org-mode levels color customization
 #+BEGIN_SRC emacs-lisp
   (custom-theme-set-faces 'doom-one
    '(org-level-1 ((t (:background "#23272e" :foreground "#da8548" :weight normal))))
@@ -223,19 +224,32 @@ Show bulleted list intead of just asterisks
    '(org-level-5 ((t (:foreground "#4db5bd"))))
    '(org-link ((t (:foreground "DarkOrchid1" :underline t)))))
 #+END_SRC
-** Theme specific settings
+
+Theme specific settings
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-fontify-whole-heading-line t
-        org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
+(setq org-fontify-whole-heading-line t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
 #+END_SRC
-** Others
+** Source code editing
+
+Use syntax highlighting in source blocks while editing
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
+
+Make TAB act as if it were issued in a buffer of the language’s major mode
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-tab-acts-natively t)
+#+END_SRC
+
+When editing a code snippet, use the current window rather than popping open a new one
 
 #+BEGIN_SRC emacs-lisp
   (setq org-ellipsis "↴")
-  (setq org-src-fontify-natively t)
-  (setq org-src-tab-acts-natively t)
   (setq org-src-window-setup 'current-window)
 #+END_SRC
 * Neotree config
