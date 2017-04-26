@@ -46,10 +46,12 @@
       page-break-lines
       dashboard ;; startup dashboard
       smartparens ;; auto fill matching parenthesis
+      helm ;; incremental completion and selection narrowing framework
+      helm-projectile ;; helm and projectile integration
       ))
 
   (add-to-list 'package-archives
-               '("melpa" . "http://melpa.org/packages/"))
+               '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 
   (when (not package-archive-contents)
     (package-refresh-contents))
@@ -275,6 +277,30 @@ Enable doom-theme for neotree
 
 #+BEGIN_SRC emacs-lisp
   (require 'doom-neotree)
+#+END_SRC
+* Helm config
+** load =helm-config=
+
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-config)
+#+END_SRC
+** General keybindings
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+#+END_SRC
+** Enable =helm-mode=
+
+#+BEGIN_SRC emacs-lisp
+(helm-mode 1)
+#+END_SRC
+** =helm-projectile= config
+
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-projectile)
+  (helm-projectile-on)
 #+END_SRC
 * Programming preferences
 Enable global =flycheck-mode=
