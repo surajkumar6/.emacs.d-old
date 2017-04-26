@@ -34,18 +34,18 @@
 
   (defvar my-packages
     '(better-defaults
-      elpy;; python package
-      flycheck;; on the fly syntax checking
-      py-autopep8;; Python pep8 support
-      magit;; git support
-      rainbow-delimiters
-      solarized-theme;; theme
+      elpy ;; python package
+      flycheck ;; on the fly syntax checking
+      py-autopep8 ;; Python pep8 support
+      magit ;; git support
+      rainbow-delimiters ;; show matching paranthesis in paired colors
       doom-themes
-      all-the-icons
-      neotree
-      projectile
+      all-the-icons ;;  icons and font pack
+      neotree ;; folder navigation side-bar
+      projectile ;; project management
       page-break-lines
-      dashboard
+      dashboard ;; startup dashboard
+      smartparens ;; auto fill matching parenthesis
       ))
 
   (add-to-list 'package-archives
@@ -252,6 +252,12 @@ When editing a code snippet, use the current window rather than popping open a n
   (setq org-ellipsis "↴")
   (setq org-src-window-setup 'current-window)
 #+END_SRC
+
+Enable smartparens
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook #'smartparens-mode)
+#+END_SRC
 * Neotree config
 Enable neotree and set a global key binding
 
@@ -296,6 +302,11 @@ Treat terms in camel case as seprate words globally
   (global-subword-mode 1)
 #+END_SRC
 
+Load default =smartparens= config
+
+#+BEGIN_SRC emacs-lisp
+  (require 'smartparens-config)
+#+END_SRC
 ** Python
 
 Enable =elpy=
