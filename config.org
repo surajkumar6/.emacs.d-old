@@ -9,6 +9,19 @@
   (sensible-defaults/use-all-keybindings)
   (sensible-defaults/backup-to-temp-directory)
 #+END_SRC
+* load =misc-cmds.el=
+A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.org/blob/master/misc-cmds.el][misc-cmds.el]]
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/resources/misc-cmds.el")
+#+END_SRC
+* Enable better defaults
+
+#+BEGIN_SRC emacs-lisp
+  (use-package better-defaults
+    :config
+    (message "better-defaults loaded"))
+#+END_SRC
 * Set personal info
 
 #+BEGIN_SRC emacs-lisp
@@ -43,7 +56,7 @@
         (package-install p)))
 
   (require 'use-package)
-  (require 'diminish)                ;; if you use :diminish
+  (require 'diminish)
   (require 'bind-key)
 #+END_SRC
 * UI Preferences
@@ -70,8 +83,8 @@
 #+BEGIN_SRC emacs-lisp
   (global-linum-mode t)
 #+END_SRC
-* Enable rainbow delimeters
-Rainbow delimeters show matching braces as color pairs
+** =rainbow-delimeters=
+Rainbow delimeters show matching braces with same color
 
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -82,7 +95,7 @@ Rainbow delimeters show matching braces as color pairs
     :config
     (message "rainbow-delimeters loaded"))
 #+END_SRC
-* Enable all-the-icons pack
+** =all-the-icon=
    A collection of icons and fonts(mainly used for neotree)
 
 #+BEGIN_SRC emacs-lisp
@@ -92,19 +105,8 @@ Rainbow delimeters show matching braces as color pairs
     :config
     (message "all-the-icons loaded"))
 #+END_SRC
-* Theme config
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
-    :ensure t
-    :config
-    (setq doom-enable-bold nil) ;; Disable bolding universally
-    (setq doom-enable-italic nil) ;; Disable italics universally
-    (setq doom-one-brighter-modeline t) ;; Enable brighter mode line
-    (setq doom-one-brighter-comments t) ;; Enable brighter comments
-    (load-theme 'doom-one t)
-    (message "doom-theme loaded"))
-#+END_SRC
-* Load =page-break-lines=
+** =page-break-lines=
+Displays ugly form feed characters as tidy horizontal rules
 
 #+BEGIN_SRC emacs-lisp
   (use-package page-break-lines
@@ -112,7 +114,8 @@ Rainbow delimeters show matching braces as color pairs
     :config
     (message "page-break-lines loaded"))
 #+END_SRC
-* Enable and configure startup dashboard
+** =dashboard=
+A startup dashboard with widgets
 
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
@@ -128,6 +131,20 @@ Rainbow delimeters show matching braces as color pairs
                             (bookmarks . 5)
                             (projects . 5)))
     (message "dashboard loaded"))
+#+END_SRC
+** =doom-themes=
+A Doon inspired theme for emacs
+
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-enable-bold nil) ;; Disable bolding universally
+    (setq doom-enable-italic nil) ;; Disable italics universally
+    (setq doom-one-brighter-modeline t) ;; Enable brighter mode line
+    (setq doom-one-brighter-comments t) ;; Enable brighter comments
+    (load-theme 'doom-one t)
+    (message "doom-theme loaded"))
 #+END_SRC
 * Set default font and configure font resizing
 I use Consolas
@@ -177,14 +194,9 @@ together.
 
   (sk/reset-font-size)
 #+END_SRC
-* Enable better defaults
-
-#+BEGIN_SRC emacs-lisp
-  (use-package better-defaults
-    :config
-    (message "better-defaults loaded"))
-#+END_SRC
-* Projectile
+* Project management
+** =projectile=
+=projectile= is a project interaction library for Emacs
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -193,7 +205,175 @@ together.
     (projectile-global-mode)
     (message "projectile loaded"))
 #+END_SRC
-* Org-mode config
+** =neotree=
+An emacs tree plugin
+
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :ensure t
+    :defer t
+    :config
+    (defun neotree-project-dir ()
+      "Open NeoTree using the git root."
+      (interactive)
+      (let ((project-dir (projectile-project-root))
+            (file-name (buffer-file-name)))
+        (neotree-toggle)
+        (if project-dir
+            (if (neo-global--window-exists-p)
+                (progn
+                  (neotree-dir project-dir)
+                  (neotree-find file-name)))
+          (message "Could not find git project root."))))
+    (use-package all-the-icons)
+    (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+    (require 'doom-neotree)
+    (message "neotree loaded")
+    :bind (
+           ([f8] . neotree-project-dir)
+           ([f7] . neotree-dir)))
+#+END_SRC
+* Search and search completion
+** =helm=
+Emacs incremental completion and selection narrowing framework
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t
+    :config
+    (require 'helm-config)
+    (helm-mode 1)
+    (message "helm loaded")
+    :bind
+    (
+     ("C-b" . helm-mini)
+     ("C-h a" . helm-apropos)
+     ("M-y" . helm-show-kill-ring)
+     ("M-x" . helm-M-x)
+     ("C-f" . helm-find-files)))
+#+END_SRC
+** =helm-projectile=
+=helm= UI for =projectile=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :defer t
+    :ensure t
+    :config
+    (helm-projectile-on)
+    (message "helm-projectile loaded"))
+#+END_SRC
+** =helm-swoop=
+Efficiently hopping squeezed lines powered by Emacs =helm= interface
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-swoop
+    :ensure t
+    :defer t
+    :config
+    (use-package helm)
+    ;; Save buffer when helm-multi-swoop-edit complete
+    (setq helm-multi-swoop-edit-save t)
+    ;; If this value is t, split window inside the current window
+    (setq helm-swoop-split-with-multiple-windows nil)
+    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+    (setq helm-swoop-split-direction 'split-window-vertically)
+    ;; If nil, you can slightly boost invoke speed in exchange for text color
+    (setq helm-swoop-speed-or-color nil)
+    ;; ;; Go to the opposite side of line from the end or beginning of line
+    (setq helm-swoop-move-to-line-cycle t)
+    ;; Optional face for line numbers
+    ;; Face name is `helm-swoop-line-number-face`
+    (setq helm-swoop-use-line-number-face t)
+    ;; If you prefer fuzzy matching
+    (setq helm-swoop-use-fuzzy-match t)
+    (message "helm-swoop loaded")
+    :bind(
+          ("M-s" . helm-swoop)
+          ("M-I" . helm-swoop-back-to-last-point)
+          ("C-c M-i" . helm-multi-swoop)
+          ("C-x M-i" . helm-multi-swoop-all)))
+#+END_SRC
+* Programming preferences
+** General preferences
+
+Delete trailing white spaces before saving a file
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+Treat terms in camel case as seprate words globally
+
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
+#+END_SRC
+
+*** Load default =smartparens= config
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :defer t
+    :config
+    (require 'smartparens-config)
+    (message "loaded smartparens"))
+#+END_SRC
+** Syntax checking
+=flycheck= provides on-the-fly syntax checking
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :defer t
+    :config
+    (global-flycheck-mode)
+    (message "flycheck loaded"))
+#+END_SRC
+** Python
+*** =elpy=
+Emacs Python Development Environment
+
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy
+    :ensure t
+    :defer t
+    :init
+    (add-hook 'python-mode-hook 'elpy-mode)
+    :config
+    (elpy-enable)
+    (when (require 'flycheck nil t)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (use-package py-autopep8
+      :ensure t
+      :config
+      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+      (message "py-autopep8 loaded"))
+      (message "elpy loaded"))
+#+END_SRC
+
+*** Indent 2 spaces
+
+#+BEGIN_SRC emacs-lisp
+  (setq python-indent 2)
+#+END_SRC
+* Version Control
+=magit= is a git porcelain for emacs
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :defer t
+    :config
+    ;;open magit-status in a fullframe buffer
+    (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1)
+    (message "magit loaded")
+    :bind (
+           ("C-x g" . magit-status)))
+#+END_SRC
+* Task management
+=org-mode= preferences
 ** Display preferences
 
 Show bulleted list instead of just asterisks
@@ -250,177 +430,6 @@ Enable smartparens
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook #'smartparens-mode)
 #+END_SRC
-* Neotree config
-Enable neotree and set global key bindings
-
-#+BEGIN_SRC emacs-lisp
-  (use-package neotree
-    :ensure t
-    :defer t
-    :config
-    (defun neotree-project-dir ()
-      "Open NeoTree using the git root."
-      (interactive)
-      (let ((project-dir (projectile-project-root))
-            (file-name (buffer-file-name)))
-        (neotree-toggle)
-        (if project-dir
-            (if (neo-global--window-exists-p)
-                (progn
-                  (neotree-dir project-dir)
-                  (neotree-find file-name)))
-          (message "Could not find git project root."))))
-    (use-package all-the-icons)
-    (message "neotree loaded")
-    :bind (
-           ([f8] . neotree-project-dir)
-           ([f7] . neotree-dir)))
-#+END_SRC
-
-Use pretty icons for files and folders
-
-#+BEGIN_SRC emacs-lisp
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-#+END_SRC
-
-Enable doom-theme for neotree
-
-#+BEGIN_SRC emacs-lisp
-  (require 'doom-neotree)
-#+END_SRC
-* Helm config
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helm
-    :ensure t
-    :config
-    (require 'helm-config)
-    (helm-mode 1)
-    (message "helm loaded")
-    :bind
-    (
-     ("C-x b" . helm-mini)
-     ("C-h a" . helm-apropos)
-     ("M-y" . helm-show-kill-ring)
-     ("M-x" . helm-M-x)
-     ("C-x C-f" . helm-find-files)))
-#+END_SRC
-* =helm-projectile= config
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-projectile
-    :defer t
-    :ensure t
-    :config
-    (helm-projectile-on)
-    (message "helm-projectile loaded"))
-#+END_SRC
-* =helm-swoop= config
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-swoop
-    :ensure t
-    :defer t
-    :config
-    (use-package helm)
-    ;; Save buffer when helm-multi-swoop-edit complete
-    (setq helm-multi-swoop-edit-save t)
-    ;; If this value is t, split window inside the current window
-    (setq helm-swoop-split-with-multiple-windows nil)
-    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
-    (setq helm-swoop-split-direction 'split-window-vertically)
-    ;; If nil, you can slightly boost invoke speed in exchange for text color
-    (setq helm-swoop-speed-or-color nil)
-    ;; ;; Go to the opposite side of line from the end or beginning of line
-    (setq helm-swoop-move-to-line-cycle t)
-    ;; Optional face for line numbers
-    ;; Face name is `helm-swoop-line-number-face`
-    (setq helm-swoop-use-line-number-face t)
-    ;; If you prefer fuzzy matching
-    (setq helm-swoop-use-fuzzy-match t)
-    (message "helm-swoop loaded")
-    :bind(
-          ("M-s" . helm-swoop)
-          ("M-I" . helm-swoop-back-to-last-point)
-          ("C-c M-i" . helm-multi-swoop)
-          ("C-x M-i" . helm-multi-swoop-all)))
-#+END_SRC
-* Programming preferences
-** General preferences
-
-Delete trailing white spaces before saving a file
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
-
-Treat terms in camel case as seprate words globally
-
-#+BEGIN_SRC emacs-lisp
-  (global-subword-mode 1)
-#+END_SRC
-
-*** Load default =smartparens= config
-
-#+BEGIN_SRC emacs-lisp
-  (use-package smartparens
-    :ensure t
-    :defer t
-    :config
-    (require 'smartparens-config)
-    (message "loaded smartparens"))
-#+END_SRC
-* Enable =elpy=
-
-#+BEGIN_SRC emacs-lisp
-  (use-package elpy
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'python-mode-hook 'elpy-mode)
-    :config
-    (elpy-enable)
-    (when (require 'flycheck nil t)
-      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-      (add-hook 'elpy-mode-hook 'flycheck-mode))
-    (use-package py-autopep8
-      :ensure t
-      :config
-      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
-      (message "py-autopep8 loaded"))
-      (message "elpy loaded"))
-#+END_SRC
-
-Indent 2 spaces
-
-#+BEGIN_SRC emacs-lisp
-  (setq python-indent 2)
-#+END_SRC
-* Flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :defer t
-    :config
-    (global-flycheck-mode)
-    (message "flycheck loaded"))
-#+END_SRC
-* My custom key bindings
-
-#+BEGIN_SRC emacs-lisp
-  ;; custom key bindings
-  (global-set-key (kbd "C-x C-q") 'save-buffers-kill-terminal) ;; was C-x C-c, overrides read-only-mode
-  (global-set-key (kbd "C-;") 'set-mark-command) ;; was C-Space
-
-  ;; easy navigation
-  (global-set-key (kbd "M-i") 'previous-line) ;;
-  (global-set-key (kbd "M-j") 'backward-char) ;;
-  (global-set-key (kbd "M-k") 'next-line) ;;
-  (global-set-key (kbd "M-l") 'forward-char) ;;
-
-  (global-set-key (kbd "M-u") 'backward-word) ;;
-  (global-set-key (kbd "M-o") 'forward-word) ;;
-#+END_SRC
 * Utility functions
 ** Insert current date and time
 
@@ -450,11 +459,7 @@ Indent 2 spaces
 ** Always kill current buffer
 
 #+BEGIN_SRC emacs-lisp
-  (defun sk/kill-current-buffer ()
-    "Kill the current buffer without prompting."
-    (interactive)
-    (kill-buffer (current-buffer)))
-  (global-set-key (kbd "C-x k") 'sk/kill-current-buffer)
+ (substitute-key-definition 'kill-buffer 'kill-buffer-and-its-windows global-map)
 #+END_SRC
 ** Use =company-mode= globally
 
@@ -466,20 +471,40 @@ Indent 2 spaces
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+END_SRC
-* Magit
+** =multiple cursors=
+Multiple cursors like Sublime Text
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
+  (use-package multiple-cursors
     :ensure t
     :defer t
     :config
-    (message "magit loaded")
+    (message "multiple-cursors loaded")
     :bind (
-           ("C-x g" . magit-status)))
+           ("C->" . mc/mark-next-like-this)
+           ("C-<" . mc/mark-previous-like-this)
+           ("C-c C-<" . mc/mark-all-like-this)))
 #+END_SRC
 * Set =custom-file= location
 
 #+BEGIN_SRC emacs-lisp
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
+#+END_SRC
+* Custom key bindings
+
+#+BEGIN_SRC emacs-lisp
+   ;; custom key bindings
+  (global-set-key (kbd "C-x C-q") 'save-buffers-kill-terminal) ;; was C-x C-c, overrides read-only-mode
+  (global-set-key (kbd "C-;") 'set-mark-command) ;; was C-Space
+
+  ;; easy navigation
+  (global-set-key (kbd "M-i") 'previous-line) ;;
+  (global-set-key (kbd "M-j") 'backward-char) ;;
+  (global-set-key (kbd "M-k") 'next-line) ;;
+  (global-set-key (kbd "M-l") 'forward-char) ;;
+
+  (global-set-key (kbd "M-u") 'backward-word) ;;
+  (global-set-key (kbd "M-o") 'forward-word) ;;
+  (global-set-key (kbd "C-s") 'save-buffer) ;;
 #+END_SRC
