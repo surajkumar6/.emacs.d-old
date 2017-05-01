@@ -203,6 +203,7 @@ together.
     :ensure t
     :config
     (projectile-global-mode)
+    (setq projectile-completion-system 'helm)
     (message "projectile loaded"))
 #+END_SRC
 ** =neotree=
@@ -212,26 +213,26 @@ An emacs tree plugin
   (use-package neotree
     :ensure t
     :defer t
+    :init
+    (add-hook 'projectile-after-switch-project-hook (lambda () (neotree-dir (projectile-project-root))))
+    (add-hook 'projectile-before-switch-project-hook 'neotree-hide)
     :config
-    (defun neotree-project-dir ()
-      "Open NeoTree using the git root."
-      (interactive)
-      (let ((project-dir (projectile-project-root))
-            (file-name (buffer-file-name)))
-        (neotree-toggle)
-        (if project-dir
-            (if (neo-global--window-exists-p)
-                (progn
-                  (neotree-dir project-dir)
-                  (neotree-find file-name)))
-          (message "Could not find git project root."))))
     (use-package all-the-icons)
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
     (require 'doom-neotree)
+    (setq doom-neotree-file-icons 'non-nil)
     (message "neotree loaded")
     :bind (
-           ([f8] . neotree-project-dir)
-           ([f7] . neotree-dir)))
+           ("C-c n" . neotree-toggle)
+           ([f7] . neotree-dir)
+           :map neotree-mode-map
+           ("C-d" . neotree-delete-node)
+           ("C-r" . neotree-rename-node)
+           ("C-w" . neotree-copy-node)
+           ("C-n" . neotree-create-node)
+           ("C-d" . neotree-delete-node)
+           ("C-i" . neotree-previous-line)
+           ("C-k" . neotree-next-line)))
 #+END_SRC
 * Search and search completion
 ** =helm=
@@ -244,13 +245,17 @@ Emacs incremental completion and selection narrowing framework
     (require 'helm-config)
     (helm-mode 1)
     (message "helm loaded")
-    :bind
-    (
+    :bind (
      ("C-b" . helm-mini)
      ("C-h a" . helm-apropos)
      ("M-y" . helm-show-kill-ring)
      ("M-x" . helm-M-x)
-     ("C-f" . helm-find-files)))
+     ("C-f" . helm-find-files)
+     :map helm-map
+     ("C-k" . helm-next-line)
+     ("C-i" . helm-previous-line)
+     ("C-l" . helm-next-source)
+     ("C-j" . helm-previous-source)))
 #+END_SRC
 ** =helm-projectile=
 =helm= UI for =projectile=
@@ -261,6 +266,7 @@ Emacs incremental completion and selection narrowing framework
     :ensure t
     :config
     (helm-projectile-on)
+    (setq helm-projectile-fuzzy-match t)
     (message "helm-projectile loaded"))
 #+END_SRC
 ** =helm-swoop=
@@ -297,19 +303,32 @@ Efficiently hopping squeezed lines powered by Emacs =helm= interface
 * Programming preferences
 ** General preferences
 
-Delete trailing white spaces before saving a file
+*** Delete trailing white spaces before saving a file
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-Treat terms in camel case as seprate words globally
+*** Treat terms in camel case as seprate words globally
 
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
 
-*** Load default =smartparens= config
+*** =highlight-symbol=
+Automatic and manual symbol highlighting
+
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-symbol
+    :ensure t
+    :bind(
+          ("C-c h" . highlight-symbol))
+    :config
+    (message "highlight-symbol loaded"))
+
+#+END_SRC
+*** =smartparens=
+Minor mode for Emacs that deals with parens pairs and tries to be smart about it
 
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
@@ -345,6 +364,7 @@ Emacs Python Development Environment
     (when (require 'flycheck nil t)
       (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
       (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (setq elpy-company-post-completion-function 'elpy-company-post-complete-parens)
     (use-package py-autopep8
       :ensure t
       :config
@@ -352,11 +372,25 @@ Emacs Python Development Environment
       (message "py-autopep8 loaded"))
       (message "elpy loaded"))
 #+END_SRC
-
 *** Indent 2 spaces
 
 #+BEGIN_SRC emacs-lisp
   (setq python-indent 2)
+#+END_SRC
+** Emacs Lisp
+*** =paredit=
+#+BEGIN_SRC emacs-lisp
+  (use-package paredit
+    :load-path "~/.emacs.d/resources/paredit"
+    :config
+    (message "paredit loaded"))
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 #+END_SRC
 * Version Control
 =magit= is a git porcelain for emacs
@@ -461,10 +495,26 @@ Enable smartparens
 #+BEGIN_SRC emacs-lisp
  (substitute-key-definition 'kill-buffer 'kill-buffer-and-its-windows global-map)
 #+END_SRC
-** Use =company-mode= globally
+** =company-mode= settings
+*** Use =company-mode= globally
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+*** Set idle-delay
+
+#+BEGIN_SRC emacs-lisp
+  (setq company-idle-delay 0)
+#+END_SRC
+*** Set minimum prefix length
+
+#+BEGIN_SRC emacs-lisp
+  (setq company-minimum-prefix-length 3)
+#+END_SRC
+*** Show numbers
+
+#+BEGIN_SRC emacs-lisp
+  (setq company-show-numbers t)
 #+END_SRC
 ** Always indent with spaces
 
@@ -499,12 +549,15 @@ Multiple cursors like Sublime Text
   (global-set-key (kbd "C-;") 'set-mark-command) ;; was C-Space
 
   ;; easy navigation
-  (global-set-key (kbd "M-i") 'previous-line) ;;
-  (global-set-key (kbd "M-j") 'backward-char) ;;
-  (global-set-key (kbd "M-k") 'next-line) ;;
-  (global-set-key (kbd "M-l") 'forward-char) ;;
+  (global-set-key (kbd "C-i") 'previous-line) ;;
+  (global-set-key (kbd "C-j") 'backward-char) ;;
+  (global-set-key (kbd "C-k") 'next-line) ;;
+  (global-set-key (kbd "C-l") 'forward-char) ;;
 
-  (global-set-key (kbd "M-u") 'backward-word) ;;
-  (global-set-key (kbd "M-o") 'forward-word) ;;
+  (global-set-key (kbd "M-k") 'scroll-up-command)
+  (global-set-key (kbd "M-i") 'scroll-down-command)
+  (global-set-key (kbd "M-j") 'backward-word) ;;
+  (global-set-key (kbd "M-l") 'forward-word) ;;
+
   (global-set-key (kbd "C-s") 'save-buffer) ;;
 #+END_SRC
