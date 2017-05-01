@@ -414,7 +414,7 @@ Show bulleted list instead of just asterisks
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    :load-path "~/.emacs.d/resources/org-bullets.el"
+    :load-path "~/.emacs.d/resources/org-bullets"
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     (message "org-bullets loaded"))
