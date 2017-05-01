@@ -1,27 +1,5 @@
 #+TITLE: Emacs configuration
 
-* Use sensible defaults
-  Use [[https://github.com/surajkumar6/emacs-config/blob/master/resources/sensible-defaults.el][sensible-defaults.el]] for some basic settings
-
-#+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/resources/sensible-defaults.el")
-  (sensible-defaults/use-all-settings)
-  (sensible-defaults/use-all-keybindings)
-  (sensible-defaults/backup-to-temp-directory)
-#+END_SRC
-* load =misc-cmds.el=
-A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.org/blob/master/misc-cmds.el][misc-cmds.el]]
-
-#+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/resources/misc-cmds.el")
-#+END_SRC
-* Enable better defaults
-
-#+BEGIN_SRC emacs-lisp
-  (use-package better-defaults
-    :config
-    (message "better-defaults loaded"))
-#+END_SRC
 * Set personal info
 
 #+BEGIN_SRC emacs-lisp
@@ -30,6 +8,12 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
         calendar-latitude 17.3
         calendar-longitude -78.4
         calendar-location-name "Hyderabad, IND")
+#+END_SRC
+* load =misc-cmds.el=
+A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.org/blob/master/misc-cmds.el][misc-cmds.el]]
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/resources/misc-cmds.el")
 #+END_SRC
 * Package management
 #+BEGIN_SRC emacs-lisp
@@ -45,7 +29,7 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
         ))
 
     (add-to-list 'package-archives
-                 '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+                 '("melpa" . "http://melpa.org/packages/") t)
 
     (when (not package-archive-contents)
       (package-refresh-contents))
@@ -58,6 +42,22 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
   (require 'use-package)
   (require 'diminish)
   (require 'bind-key)
+#+END_SRC
+* Use sensible defaults
+  Use [[https://github.com/surajkumar6/emacs-config/blob/master/resources/sensible-defaults.el][sensible-defaults.el]] for some basic settings
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/resources/sensible-defaults.el")
+  (sensible-defaults/use-all-settings)
+  (sensible-defaults/use-all-keybindings)
+  (sensible-defaults/backup-to-temp-directory)
+#+END_SRC
+* Enable better defaults
+
+#+BEGIN_SRC emacs-lisp
+  (use-package better-defaults
+    :config
+    (message "better-defaults loaded"))
 #+END_SRC
 * UI Preferences
 ** Disable toolbars and menus
