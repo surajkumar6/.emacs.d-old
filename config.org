@@ -341,6 +341,18 @@ Minor mode for Emacs that deals with parens pairs and tries to be smart about it
     (require 'smartparens-config)
     (message "loaded smartparens"))
 #+END_SRC
+*** =dumb-jump=
+A 'jump to definition' package
+
+#+BEGIN_SRC emacs-lisp
+    (use-package dumb-jump
+      :ensure t
+      :defer t
+      :bind (("C-c j" . dumb-jump-go))
+      :config
+      (dumb-jump-mode)
+      (message "dumb-jump loaded"))
+#+END_SRC
 ** Syntax checking
 =flycheck= provides on-the-fly syntax checking
 
