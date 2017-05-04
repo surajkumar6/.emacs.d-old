@@ -214,7 +214,10 @@ An emacs tree plugin
     :ensure t
     :defer t
     :init
-    (add-hook 'projectile-after-switch-project-hook (lambda () (neotree-dir (projectile-project-root))))
+    (defun open-neotree-after-opening-projectile-project()
+      (neotree-dir (projectile-project-root))
+      (other-window 1))
+    (add-hook 'projectile-after-switch-project-hook 'open-neotree-after-opening-projectile-project)
     (add-hook 'projectile-before-switch-project-hook 'neotree-hide)
     :config
     (use-package all-the-icons)
