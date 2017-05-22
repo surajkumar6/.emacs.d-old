@@ -31,6 +31,9 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
     (add-to-list 'package-archives
                  '("melpa" . "http://melpa.org/packages/") t)
 
+    (add-to-list 'package-archives
+                 '("org" . "http://orgmode.org/elpa/") t)
+
     (when (not package-archive-contents)
       (package-refresh-contents))
     (package-initialize)
@@ -221,7 +224,10 @@ An emacs tree plugin
     :ensure t
     :defer t
     :init
-    (add-hook 'projectile-after-switch-project-hook (lambda () (neotree-dir (projectile-project-root))))
+    (defun open-neotree-after-opening-projectile-project()
+      (neotree-dir (projectile-project-root))
+      (other-window 1))
+    (add-hook 'projectile-after-switch-project-hook 'open-neotree-after-opening-projectile-project)
     (add-hook 'projectile-before-switch-project-hook 'neotree-hide)
     :config
     (use-package all-the-icons)
@@ -345,6 +351,18 @@ Minor mode for Emacs that deals with parens pairs and tries to be smart about it
     (require 'smartparens-config)
     (message "loaded smartparens"))
 #+END_SRC
+*** =dumb-jump=
+A 'jump to definition' package
+
+#+BEGIN_SRC emacs-lisp
+    (use-package dumb-jump
+      :ensure t
+      :defer t
+      :bind (("C-c j" . dumb-jump-go))
+      :config
+      (dumb-jump-mode)
+      (message "dumb-jump loaded"))
+#+END_SRC
 ** Syntax checking
 =flycheck= provides on-the-fly syntax checking
 
@@ -415,6 +433,7 @@ Emacs Python Development Environment
 #+END_SRC
 * Task management
 =org-mode= preferences
+
 ** Activation
 
 #+BEGIN_SRC emacs-lisp
@@ -422,7 +441,14 @@ Emacs Python Development Environment
   (global-set-key (kbd "C-c a") 'org-agenda)
   (global-set-key (kbd "C-c c") 'org-capture)
   (global-set-key (kbd "C-c b") 'org-iswitchb)
+#+END_SRC
+** load =org-mode= package
 
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    :config
+    (message "org-mode loaded"))
 #+END_SRC
 ** Display preferences
 
@@ -479,6 +505,14 @@ Enable smartparens
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook #'smartparens-mode)
+#+END_SRC
+** =org-drill=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-drill
+    :config
+    (add-to-list 'org-modules 'org-drill)
+    (message "org-drill loaded"))
 #+END_SRC
 * Utility functions
 ** Insert current date and time
@@ -550,6 +584,53 @@ Multiple cursors like Sublime Text
            ("C->" . mc/mark-next-like-this)
            ("C-<" . mc/mark-previous-like-this)
            ("C-c C-<" . mc/mark-all-like-this)))
+#+END_SRC
+** line editing
+*** Copying curent line
+
+#+BEGIN_SRC emacs-lisp
+  (defun quick-copy-line ()
+        "Copy the whole line that point is on and move to the beginning of the next line.
+      Consecutive calls to this command append each line to the
+      kill-ring."
+        (interactive)
+        (let ((beg (line-beginning-position 1))
+              (end (line-beginning-position 2)))
+          (if (eq last-command 'quick-copy-line)
+              (kill-append (buffer-substring beg end) (< end beg))
+            (kill-new (buffer-substring beg end))))
+        (beginning-of-line 2))
+#+END_SRC
+*** Cutting current line
+
+#+BEGIN_SRC emacs-lisp
+  (defun quick-cut-line ()
+    "Cut the whole line that point is on.  Consecutive calls to this command append each line to the kill-ring."
+    (interactive)
+    (let ((beg (line-beginning-position 1))
+          (end (line-beginning-position 2)))
+      (if (eq last-command 'quick-cut-line)
+          (kill-append (buffer-substring beg end) (< end beg))
+        (kill-new (buffer-substring beg end)))
+      (delete-region beg end))
+    (beginning-of-line 1)
+    (setq this-command 'quick-cut-line))
+#+END_SRC
+*** Moving lines
+
+#+BEGIN_SRC emacs-lisp
+  (defun move-line-up ()
+    "Move the line up and place the point at the beginning of the line"
+    (interactive)
+    (transpose-lines 1)
+    (forward-line -2))
+
+  (defun move-line-down ()
+    "Move the line down and place the point at the beginning of the line"
+    (interactive)
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1))
 #+END_SRC
 * Set =custom-file= location
 
