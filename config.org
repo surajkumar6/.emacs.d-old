@@ -402,6 +402,13 @@ Emacs Python Development Environment
 #+BEGIN_SRC emacs-lisp
   (setq python-indent 2)
 #+END_SRC
+*** =python-django=
+Django project management package
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/resources/python-django.el")
+  (require 'python-django)
+#+END_SRC
 ** Emacs Lisp
 *** =paredit=
 #+BEGIN_SRC emacs-lisp
