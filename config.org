@@ -550,6 +550,53 @@ Multiple cursors like Sublime Text
            ("C-<" . mc/mark-previous-like-this)
            ("C-c C-<" . mc/mark-all-like-this)))
 #+END_SRC
+** line editing
+*** Copying curent line
+
+#+BEGIN_SRC emacs-lisp
+  (defun quick-copy-line ()
+        "Copy the whole line that point is on and move to the beginning of the next line.
+      Consecutive calls to this command append each line to the
+      kill-ring."
+        (interactive)
+        (let ((beg (line-beginning-position 1))
+              (end (line-beginning-position 2)))
+          (if (eq last-command 'quick-copy-line)
+              (kill-append (buffer-substring beg end) (< end beg))
+            (kill-new (buffer-substring beg end))))
+        (beginning-of-line 2))
+#+END_SRC
+*** Cutting current line
+
+#+BEGIN_SRC emacs-lisp
+  (defun quick-cut-line ()
+    "Cut the whole line that point is on.  Consecutive calls to this command append each line to the kill-ring."
+    (interactive)
+    (let ((beg (line-beginning-position 1))
+          (end (line-beginning-position 2)))
+      (if (eq last-command 'quick-cut-line)
+          (kill-append (buffer-substring beg end) (< end beg))
+        (kill-new (buffer-substring beg end)))
+      (delete-region beg end))
+    (beginning-of-line 1)
+    (setq this-command 'quick-cut-line))
+#+END_SRC
+*** Moving lines
+
+#+BEGIN_SRC emacs-lisp
+  (defun move-line-up ()
+    "Move the line up and place the point at the beginning of the line"
+    (interactive)
+    (transpose-lines 1)
+    (forward-line -2))
+
+  (defun move-line-down ()
+    "Move the line down and place the point at the beginning of the line"
+    (interactive)
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1))
+#+END_SRC
 * Set =custom-file= location
 
 #+BEGIN_SRC emacs-lisp
