@@ -31,6 +31,9 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
     (add-to-list 'package-archives
                  '("melpa" . "http://melpa.org/packages/") t)
 
+    (add-to-list 'package-archives
+                 '("org" . "http://orgmode.org/elpa/") t)
+
     (when (not package-archive-contents)
       (package-refresh-contents))
     (package-initialize)
@@ -423,6 +426,15 @@ Emacs Python Development Environment
 #+END_SRC
 * Task management
 =org-mode= preferences
+
+** load =org-mode= package
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    :config
+    (message "org-mode loaded"))
+#+END_SRC
 ** Display preferences
 
 Show bulleted list instead of just asterisks
@@ -478,6 +490,14 @@ Enable smartparens
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook #'smartparens-mode)
+#+END_SRC
+** =org-drill=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-drill
+    :config
+    (add-to-list 'org-modules 'org-drill)
+    (message "org-drill loaded"))
 #+END_SRC
 * Utility functions
 ** Insert current date and time
