@@ -434,6 +434,15 @@ Emacs Python Development Environment
 * Task management
 =org-mode= preferences
 
+** load =org-mode= package
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib
+    :config
+    (org-reload)
+    (message "org-mode loaded"))
+#+END_SRC
 ** Activation
 
 #+BEGIN_SRC emacs-lisp
@@ -441,14 +450,6 @@ Emacs Python Development Environment
   (global-set-key (kbd "C-c a") 'org-agenda)
   (global-set-key (kbd "C-c c") 'org-capture)
   (global-set-key (kbd "C-c b") 'org-iswitchb)
-#+END_SRC
-** load =org-mode= package
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
-    :config
-    (message "org-mode loaded"))
 #+END_SRC
 ** Display preferences
 
