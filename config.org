@@ -59,6 +59,13 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
     :config
     (message "better-defaults loaded"))
 #+END_SRC
+* Shell
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/resources/multi-term.el")
+  (require 'multi-term)
+  (setq multi-term-program "/bin/zsh")
+#+END_SRC
 * UI Preferences
 ** Disable toolbars and menus
 
@@ -408,6 +415,15 @@ Emacs Python Development Environment
 #+END_SRC
 * Task management
 =org-mode= preferences
+** Activation
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c l") 'org-store-link)
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (global-set-key (kbd "C-c c") 'org-capture)
+  (global-set-key (kbd "C-c b") 'org-iswitchb)
+
+#+END_SRC
 ** Display preferences
 
 Show bulleted list instead of just asterisks
