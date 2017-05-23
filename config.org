@@ -213,7 +213,7 @@ together.
     :ensure t
     :config
     (projectile-global-mode)
-    (setq projectile-completion-system 'helm)
+    (setq projectile-completion-system 'ivy)
     (message "projectile loaded"))
 #+END_SRC
 ** =neotree=
@@ -247,71 +247,38 @@ An emacs tree plugin
            ("C-i" . neotree-previous-line)
            ("C-k" . neotree-next-line)))
 #+END_SRC
-* Search and search completion
-** =helm=
-Emacs incremental completion and selection narrowing framework
+* Search and search completion(helm, helm-projectile, swoop)
+
+** =ivy=, =swiper= and =counsel=
 
 #+BEGIN_SRC emacs-lisp
-  (use-package helm
+  (use-package counsel
     :ensure t
     :config
-    (require 'helm-config)
-    (helm-mode 1)
-    (message "helm loaded")
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    (message "ivy,swiper,counsel loaded")
     :bind (
-     ("C-b" . helm-mini)
-     ("C-h a" . helm-apropos)
-     ("M-y" . helm-show-kill-ring)
-     ("M-x" . helm-M-x)
-     ("C-f" . helm-find-files)
-     :map helm-map
-     ("C-k" . helm-next-line)
-     ("C-i" . helm-previous-line)
-     ("C-l" . helm-next-source)
-     ("C-j" . helm-previous-source)))
+           ("M-s" . swiper)
+           ("M-x" . counsel-M-x)
+           ("C-f" . counsel-find-file)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-c g" . counsel-git)
+           ("C-c j" . counsel-git-grep)
+           ("C-x l" . counsel-locate)
+           ("C-c C-r" . ivy-resume)))
 #+END_SRC
-** =helm-projectile=
-=helm= UI for =projectile=
+** =counsel-projectile=
 
 #+BEGIN_SRC emacs-lisp
-  (use-package helm-projectile
-    :defer t
+  (use-package counsel-projectile
     :ensure t
     :config
-    (helm-projectile-on)
-    (setq helm-projectile-fuzzy-match t)
-    (message "helm-projectile loaded"))
-#+END_SRC
-** =helm-swoop=
-Efficiently hopping squeezed lines powered by Emacs =helm= interface
-
-#+BEGIN_SRC emacs-lisp
-  (use-package helm-swoop
-    :ensure t
-    :defer t
-    :config
-    (use-package helm)
-    ;; Save buffer when helm-multi-swoop-edit complete
-    (setq helm-multi-swoop-edit-save t)
-    ;; If this value is t, split window inside the current window
-    (setq helm-swoop-split-with-multiple-windows nil)
-    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
-    (setq helm-swoop-split-direction 'split-window-vertically)
-    ;; If nil, you can slightly boost invoke speed in exchange for text color
-    (setq helm-swoop-speed-or-color nil)
-    ;; ;; Go to the opposite side of line from the end or beginning of line
-    (setq helm-swoop-move-to-line-cycle t)
-    ;; Optional face for line numbers
-    ;; Face name is `helm-swoop-line-number-face`
-    (setq helm-swoop-use-line-number-face t)
-    ;; If you prefer fuzzy matching
-    (setq helm-swoop-use-fuzzy-match t)
-    (message "helm-swoop loaded")
-    :bind(
-          ("M-s" . helm-swoop)
-          ("M-I" . helm-swoop-back-to-last-point)
-          ("C-c M-i" . helm-multi-swoop)
-          ("C-x M-i" . helm-multi-swoop-all)))
+    (counsel-projectile-on)
+    (message counsel-projectile loaded)
+    :bind (("C-c p SPC" . counsel-projectile)))
 #+END_SRC
 * Programming preferences
 ** General preferences
@@ -321,13 +288,11 @@ Efficiently hopping squeezed lines powered by Emacs =helm= interface
 #+BEGIN_SRC emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
-
 *** Treat terms in camel case as seprate words globally
 
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
-
 *** =highlight-symbol=
 Automatic and manual symbol highlighting
 
@@ -434,6 +399,7 @@ Django project management package
     :config
     ;;open magit-status in a fullframe buffer
     (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1)
+    (setq magit-completing-read-function 'ivy-completing-read)
     (message "magit loaded")
     :bind (
            ("C-x g" . magit-status)))
