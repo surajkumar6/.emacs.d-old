@@ -247,7 +247,7 @@ An emacs tree plugin
            ("C-i" . neotree-previous-line)
            ("C-k" . neotree-next-line)))
 #+END_SRC
-* Search and search completion(helm, helm-projectile, swoop)
+* Search and search completion
 
 ** =ivy=, =swiper= and =counsel=
 
@@ -407,15 +407,6 @@ Django project management package
 * Task management
 =org-mode= preferences
 
-** load =org-mode= package
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
-    :config
-    (org-reload)
-    (message "org-mode loaded"))
-#+END_SRC
 ** Activation
 
 #+BEGIN_SRC emacs-lisp
@@ -485,8 +476,23 @@ Enable smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package org-drill
     :config
-    (add-to-list 'org-modules 'org-drill)
+    (add-to-list 'load-path "~/.emacs.d/resources/org-learn.el")
+    (add-to-list 'load-path "~/.emacs.d/resources/org-drill.el")
+    (require 'org-drill)
+    (setq org-drill-spaced-repetition-algorithm 'sm2)
     (message "org-drill loaded"))
+#+END_SRC
+** =org-capture=
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-default-notes-file (concat org-directory "~/Dropbox/Org/notes.org"))
+  (setq org-capture-templates
+   '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+               "* TODO %?\n  %i\n  %a")
+     ("j" "Journal" entry (file+datetree "~/Dropbox/Org/journal/journal.org")
+      "* %?\nEntered on %U\n  %i\n  %a")
+     ("v" "Vocabulary" entry (file+headline "~/Dropbox/Org/GRE/vocabulary.org" "Vocabulary")
+      "* Word :drill:\n %^{word}\n** Meaning \n%^{meaning}")))
 #+END_SRC
 * Utility functions
 ** Insert current date and time
