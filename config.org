@@ -632,3 +632,42 @@ Multiple cursors like Sublime Text
 
   (global-set-key (kbd "C-s") 'save-buffer) ;;
 #+END_SRC
+* =hydra=
+Emacs bindings that stick around
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :ensure t
+    :config
+    ;;neotree
+    (defhydra hydra-neotree (:hint nil
+                                   :pre neotree-show
+                                   :post neotree-hide
+                                   :color pink)
+    ("r" neotree-rename-node "rename")
+    ("w" neotree-copy-node "copy")
+    ("n" neotree-create-node "new")
+    ("d" neotree-delete-node "delete")
+    ("i" neotree-previous-line)
+    ("k" neotree-next-line)
+    ("h" neotree-hidden-file-toggle "hidden-files")
+    ("s" neotree-stretch-toggle "stretch")
+    ("f" neotree-quick-look "quick-look")
+    ("e" neotree-enter "select")
+    ("q" nil "quit"))
+    (global-set-key (kbd "C-c n") 'hydra-neotree/body))
+
+    ;;navigation
+    (defhydra hydra-navigation (:hint nil
+                                    :color pink)
+    ("l" forward-char)
+    ("j" backward-char)
+    ("k" next-line)
+    ("i" previous-line)
+    ("w" scroll-down-command)
+    ("s" scroll-up-command)
+    ("a" backward-word)
+    ("d" forward-word)
+    ("q" nil "quit"))
+    (global-set-key (kbd "C-n") 'hydra-navigation/body)
+#+END_SRC
