@@ -213,6 +213,7 @@ together.
     :ensure t
     :config
     (projectile-global-mode)
+    (setq projectile-completion-system 'ivy)
     (message "projectile loaded"))
 #+END_SRC
 ** =neotree=
@@ -248,6 +249,37 @@ An emacs tree plugin
 #+END_SRC
 * Search and search completion(helm, helm-projectile, swoop)
 
+** =ivy=, =swiper= and =counsel=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :ensure t
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    (message "ivy,swiper,counsel loaded")
+    :bind (
+           ("M-s" . swiper)
+           ("M-x" . counsel-M-x)
+           ("C-f" . counsel-find-file)
+           ("C-h f" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-c g" . counsel-git)
+           ("C-c j" . counsel-git-grep)
+           ("C-x l" . counsel-locate)
+           ("C-c C-r" . ivy-resume)))
+#+END_SRC
+** =counsel-projectile=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel-projectile
+    :ensure t
+    :config
+    (counsel-projectile-on)
+    (message counsel-projectile loaded)
+    :bind (("C-c p SPC" . counsel-projectile)))
+#+END_SRC
 * Programming preferences
 ** General preferences
 
@@ -367,6 +399,7 @@ Django project management package
     :config
     ;;open magit-status in a fullframe buffer
     (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1)
+    (setq magit-completing-read-function 'ivy-completing-read)
     (message "magit loaded")
     :bind (
            ("C-x g" . magit-status)))
