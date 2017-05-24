@@ -533,6 +533,22 @@ Enable smartparens
   (global-set-key (kbd "C-x C-d") 'insert-current-date-time)
   (global-set-key (kbd "C-x C-t") 'insert-current-time)
 #+END_SRC
+** Splitting windows
+
+#+BEGIN_SRC emacs-lisp
+  (defun split-window-right-and-move-cursor ()
+    (interactive)
+    (split-window-right)
+    (other-window 1))
+
+  (defun split-window-below-and-move-cursor ()
+    (interactive)
+    (split-window-below)
+    (other-window 1))
+
+  (substitute-key-definition 'split-window-right 'split-window-right-and-move-cursor global-map)
+  (substitute-key-definition 'split-window-below 'split-window-below-and-move-cursor global-map)
+#+END_SRC
 * Editing settings
 ** Always kill current buffer
 
