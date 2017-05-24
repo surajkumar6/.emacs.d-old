@@ -204,6 +204,13 @@ together.
 
   (sk/reset-font-size)
 #+END_SRC
+* =hydra=
+Emacs bindings that stick around
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :ensure t)
+#+END_SRC
 * Project management
 ** =projectile=
 =projectile= is a project interaction library for Emacs
@@ -224,28 +231,35 @@ An emacs tree plugin
     :ensure t
     :defer t
     :init
+    ;;Open neotree buffer after opening a project
     (defun open-neotree-after-opening-projectile-project()
       (neotree-dir (projectile-project-root))
       (other-window 1))
     (add-hook 'projectile-after-switch-project-hook 'open-neotree-after-opening-projectile-project)
     (add-hook 'projectile-before-switch-project-hook 'neotree-hide)
+    ;;Hydra bindings
+    (defhydra hydra-neotree (:hint nil
+                                     :pre neotree-show
+                                     :post neotree-hide
+                                     :color pink)
+      ("r" neotree-rename-node "rename")
+      ("w" neotree-copy-node "copy")
+      ("n" neotree-create-node "new")
+      ("d" neotree-delete-node "delete")
+      ("i" neotree-previous-line)
+      ("k" neotree-next-line)
+      ("h" neotree-hidden-file-toggle "hidden-files")
+      ("s" neotree-stretch-toggle "stretch")
+      ("f" neotree-quick-look "quick-look")
+      ("e" neotree-enter "select")
+      ("q" nil "quit"))
+    (global-set-key (kbd "C-c n") 'hydra-neotree/body)
     :config
     (use-package all-the-icons)
     (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
     (require 'doom-neotree)
     (setq doom-neotree-file-icons 'non-nil)
-    (message "neotree loaded")
-    :bind (
-           ("C-c n" . neotree-toggle)
-           ([f7] . neotree-dir)
-           :map neotree-mode-map
-           ("C-d" . neotree-delete-node)
-           ("C-r" . neotree-rename-node)
-           ("C-w" . neotree-copy-node)
-           ("C-n" . neotree-create-node)
-           ("C-d" . neotree-delete-node)
-           ("C-i" . neotree-previous-line)
-           ("C-k" . neotree-next-line)))
+    (message "neotree loaded"))
 #+END_SRC
 * Search and search completion
 
@@ -629,6 +643,22 @@ Multiple cursors like Sublime Text
   (setq mouse-wheel-follow-mouse 't)
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 #+END_SRC
+** Easy navigation
+
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-navigation (:hint nil
+                                  :color pink)
+  ("l" forward-char)
+  ("j" backward-char)
+  ("k" next-line)
+  ("i" previous-line)
+  ("w" scroll-down-command)
+  ("s" scroll-up-command)
+  ("a" backward-word)
+  ("d" forward-word)
+  ("q" nil "quit"))
+  (global-set-key (kbd "C-n") 'hydra-navigation/body)
+#+END_SRC
 * Set =custom-file= location
 
 #+BEGIN_SRC emacs-lisp
@@ -656,43 +686,4 @@ Multiple cursors like Sublime Text
   (global-set-key (kbd "C-s") 'save-buffer) ;;
   (global-set-key (kbd "C-r") (lambda () (interactive) (recenter-top-bottom 0)))
 
-#+END_SRC
-* =hydra=
-Emacs bindings that stick around
-
-#+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :ensure t
-    :config
-    ;;neotree
-    (defhydra hydra-neotree (:hint nil
-                                   :pre neotree-show
-                                   :post neotree-hide
-                                   :color pink)
-    ("r" neotree-rename-node "rename")
-    ("w" neotree-copy-node "copy")
-    ("n" neotree-create-node "new")
-    ("d" neotree-delete-node "delete")
-    ("i" neotree-previous-line)
-    ("k" neotree-next-line)
-    ("h" neotree-hidden-file-toggle "hidden-files")
-    ("s" neotree-stretch-toggle "stretch")
-    ("f" neotree-quick-look "quick-look")
-    ("e" neotree-enter "select")
-    ("q" nil "quit"))
-    (global-set-key (kbd "C-c n") 'hydra-neotree/body))
-
-    ;;navigation
-    (defhydra hydra-navigation (:hint nil
-                                    :color pink)
-    ("l" forward-char)
-    ("j" backward-char)
-    ("k" next-line)
-    ("i" previous-line)
-    ("w" scroll-down-command)
-    ("s" scroll-up-command)
-    ("a" backward-word)
-    ("d" forward-word)
-    ("q" nil "quit"))
-    (global-set-key (kbd "C-n") 'hydra-navigation/body)
 #+END_SRC
