@@ -612,6 +612,18 @@ Multiple cursors like Sublime Text
     (transpose-lines 1)
     (forward-line -1))
 #+END_SRC
+** Smooth scrolling
+
+#+BEGIN_SRC emacs-lisp
+  (setq auto-window-vscroll nil)
+  (setq linum-delay t)
+  (setq scroll-conservatively 10000)
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+  (setq auto-save-interval 500)
+  (setq mouse-wheel-follow-mouse 't)
+  (add-to-list 'load-path "~/.emacs.d/resources/smooth-scrolling.el")
+  (require 'smooth-scrolling)
+#+END_SRC
 * Set =custom-file= location
 
 #+BEGIN_SRC emacs-lisp
