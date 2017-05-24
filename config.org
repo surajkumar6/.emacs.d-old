@@ -580,6 +580,7 @@ Multiple cursors like Sublime Text
               (kill-append (buffer-substring beg end) (< end beg))
             (kill-new (buffer-substring beg end))))
         (beginning-of-line 2))
+  (global-set-key (kbd "C-S-C") 'quick-copy-line)
 #+END_SRC
 *** Cutting current line
 
@@ -595,6 +596,7 @@ Multiple cursors like Sublime Text
       (delete-region beg end))
     (beginning-of-line 1)
     (setq this-command 'quick-cut-line))
+  (global-set-key (kbd "C-S-D") 'quick-cut-line)
 #+END_SRC
 *** Moving lines
 
@@ -611,18 +613,21 @@ Multiple cursors like Sublime Text
     (forward-line 1)
     (transpose-lines 1)
     (forward-line -1))
+
+  (global-set-key (kbd "C-S-K") 'move-line-down)
+  (global-set-key (kbd "C-S-I") 'move-line-up)
 #+END_SRC
 ** Smooth scrolling
 
 #+BEGIN_SRC emacs-lisp
-  (setq auto-window-vscroll nil)
-  (setq linum-delay t)
-  (setq scroll-conservatively 10000)
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-  (setq auto-save-interval 500)
-  (setq mouse-wheel-follow-mouse 't)
   (add-to-list 'load-path "~/.emacs.d/resources/smooth-scrolling.el")
   (require 'smooth-scrolling)
+  (setq linum-delay t)
+  (setq auto-window-vscroll nil)
+  (setq scroll-conservatively 10000)
+  (setq auto-save-interval 500)
+  (setq mouse-wheel-follow-mouse 't)
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 #+END_SRC
 * Set =custom-file= location
 
@@ -649,6 +654,8 @@ Multiple cursors like Sublime Text
   (global-set-key (kbd "M-l") 'forward-word) ;;
 
   (global-set-key (kbd "C-s") 'save-buffer) ;;
+  (global-set-key (kbd "C-r") (lambda () (interactive) (recenter-top-bottom 0)))
+
 #+END_SRC
 * =hydra=
 Emacs bindings that stick around
