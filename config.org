@@ -505,12 +505,41 @@ Enable smartparens
 ** =org-capture=
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-default-notes-file (concat org-directory "~/Dropbox/Org/notes.org"))
+  (setq org-default-notes-file "~/Dropbox/Org/notes.org")
   (setq org-capture-templates
-   '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
-               "* TODO %?\n  %i\n  %a")
-     ("j" "Journal" entry (file+datetree "~/Dropbox/Org/journal/journal.org")
+   '(("c" "Templates for collecting thoughts and ideas")
+     ("ca" "Articles" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Articles")
+        "* Read %?\n %T")
+     ("cb" "Books" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Books")
+      "* Read %?\n %T")
+     ("cc" "College" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "College")
+      "* %?\n %T")
+     ("cd" "Dreams" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Dreams")
+      "* %?\n %T")
+     ("cg" "Goals" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Goals")
+      "* %?\n %T")
+     ("ch" "Habits" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Habits")
+      "* %?\n %T")
+     ("ci" "Ideas" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Ideas")
+      "* %?\n %T")
+     ("cl" "Learn" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Learn")
+      "* %?\n %T")
+     ("cm" "Movies" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Movies")
+      "* Watch %?\n %T")
+     ("co" "Others" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Others")
+      "* %?\n %T")
+     ("cp" "Purchase" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Purchase")
+      "* Buy %?\n %T")
+     ("ct" "TV series" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "TV series")
+      "* Watch %?\n %T")
+     ("cv" "Videos" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Videos")
+        "* Watch %?\n %T")
+     ("cw" "Work" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Work")
+      "* %?\n %T")
+     ("j" "Journal" entry (file+datetree (concat "~/Dropbox/Org/journal/" (format-time-string "%Y" (current-time)) "/" (format-time-string "%B" (current-time)) ".org"))
       "* %?\nEntered on %U\n  %i\n  %a")
+     ("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+      "* TODO %?\n  %i\n  %a")
      ("v" "Vocabulary" entry (file+headline "~/Dropbox/Org/GRE/vocabulary.org" "Vocabulary")
       "* Word :drill:\n %^{word}\n** Meaning \n%^{meaning}")))
 #+END_SRC
@@ -556,6 +585,11 @@ Enable smartparens
   (substitute-key-definition 'split-window-below 'split-window-below-and-move-cursor global-map)
 #+END_SRC
 * Editing settings
+** Enable visual line mode
+
+#+BEGIN_SRC emacs-lisp
+  (visual-line-mode t)
+#+END_SRC
 ** Always kill current buffer
 
 #+BEGIN_SRC emacs-lisp
