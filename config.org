@@ -426,13 +426,20 @@ Django project management package
 * Task management
 =org-mode= preferences
 
-** Activation
+** Global key bindings
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c l") 'org-store-link)
   (global-set-key (kbd "C-c a") 'org-agenda)
   (global-set-key (kbd "C-c c") 'org-capture)
   (global-set-key (kbd "C-c b") 'org-iswitchb)
+#+END_SRC
+** =org-mode= key bindings
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-M-w" 'append-next-kill org-mode-map)
+  (bind-key "C-c t" 'org-show-todo-tree org-mode-map)
+  (bind-key "C-c r" 'org-refile org-mode-map)
 #+END_SRC
 ** Display preferences
 
