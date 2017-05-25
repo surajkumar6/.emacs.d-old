@@ -537,12 +537,19 @@ Enable smartparens
         "* [[%^{Link}][%^{Description}]]\n %T" :immediate-finish t)
      ("cw" "Work" entry (file+headline gtd-collection-bucket "Work")
       "* %?\n %T")
-     ("j" "Journal" entry (file+datetree (concat "~/Dropbox/Org/journal/" (format-time-string "%Y" (current-time)) "/" (format-time-string "%B" (current-time)) ".org"))
-      "* %?\nEntered on %U\n  %i\n  %a")
      ("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
       "* TODO %?\n  %i\n  %a")
      ("v" "Vocabulary" entry (file+headline "~/Dropbox/Org/GRE/vocabulary.org" "Vocabulary")
       "* Word :drill:\n %^{word}\n** Meaning \n%^{meaning}")))
+#+END_SRC
+** =org-journal=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-journal
+    :ensure t
+    :config
+    (setq org-journal-dir "~/Dropbox/Org/journal/")
+    (setq org-journal-date-format "%A, %d-%B-%Y"))
 #+END_SRC
 * Utility functions
 ** Insert current date and time
