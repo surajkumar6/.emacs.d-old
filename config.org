@@ -1,3 +1,4 @@
+
 #+TITLE: Emacs configuration
 
 * Toggle full screen mode
@@ -238,7 +239,7 @@ An emacs tree plugin
     :init
     ;;Hydra bindings
     (defhydra hydra-neotree (:hint nil
-                                     :pre neotree-show
+                                     :pre  (neotree-dir (projectile-project-root))
                                      :post neotree-hide
                                      :color pink)
       ("r" neotree-rename-node "rename")
@@ -508,8 +509,8 @@ Enable smartparens
   (setq org-default-notes-file "~/Dropbox/Org/notes.org")
   (setq org-capture-templates
    '(("c" "Templates for collecting thoughts and ideas")
-     ("ca" "Articles" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Articles")
-        "* Read %?\n %T")
+     ("ca" "Articles/Links" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Articles/Links")
+        "* [[%^{Link}][%^{Description}]]\n %T" :immediate-finish t)
      ("cb" "Books" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Books")
       "* Read %?\n %T")
      ("cc" "College" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "College")
@@ -533,7 +534,7 @@ Enable smartparens
      ("ct" "TV series" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "TV series")
       "* Watch %?\n %T")
      ("cv" "Videos" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Videos")
-        "* Watch %?\n %T")
+        "* [[%^{Link}][%^{Description}]]\n %T" :immediate-finish t)
      ("cw" "Work" entry (file+headline "~/Dropbox/Org/organizer/collection_bucket.org" "Work")
       "* %?\n %T")
      ("j" "Journal" entry (file+datetree (concat "~/Dropbox/Org/journal/" (format-time-string "%Y" (current-time)) "/" (format-time-string "%B" (current-time)) ".org"))
