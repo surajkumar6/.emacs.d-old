@@ -517,6 +517,8 @@ Enable smartparens
       "* %?\n %T")
      ("cd" "Dreams" entry (file+headline gtd-collection-bucket "Dreams")
       "* %?\n %T")
+     ("cf" "Food and restaurants" entry (file+headline gtd-collection-bucket "Food/Restaurants")
+      "* %?\n %T")
      ("cg" "Goals" entry (file+headline gtd-collection-bucket "Goals")
       "* %?\n %T")
      ("ch" "Habits" entry (file+headline gtd-collection-bucket "Habits")
