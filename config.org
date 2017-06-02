@@ -1179,7 +1179,7 @@ Enable smartparens
      ("ct" "TV series/Anime" entry (file+headline gtd-collection-bucket "TV series/Anime")
       "* Watch %^{Watch}\n %T" :immediate-finish t)
      ("cv" "Videos" entry (file+headline gtd-collection-bucket "Videos")
-        "* [[%^{Link}][%^{Description}]]\n %T" :immediate-finish t)
+        "* [[%^{Link}][%^{Description}]]\n   - Captured on %T" :immediate-finish t)
      ("cw" "Work" entry (file+headline gtd-collection-bucket "Work")
       "* %?\n %T")
      ("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
@@ -1195,6 +1195,90 @@ Enable smartparens
     :config
     (setq org-journal-dir "~/Dropbox/Org/journal/")
     (setq org-journal-date-format "%A, %d-%B-%Y"))
+#+END_SRC
+** Tasks and states
+
+*** Todo Keywords and keyword faces
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MEETING" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold))))
+#+END_SRC
+*** Fast todo selection
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-use-fast-todo-selection t)
+#+END_SRC
+*** Skipping processing
+
+This setting allows changing todo states with S-left and S-right skipping all of the normal processing when entering or leaving a todo state. This cycles through the todo states but skips setting timestamps and entering notes.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+END_SRC
+*** Todo state triggers
+
+Used to automatically assign tags to tasks based on state changes.
+Following are the rules:
+ - Moving a task to =CANCELLED= adds a =CANCELLED= tag
+ - Moving a task to =WAITING= adds a =WAITING= tag
+ - Moving a task to =HOLD= adds =WAITING= and =HOLD= tags
+ - Moving a task to =DONE= state removes =WAITING= and =HOLD= tags
+ - Moving a task to =TODO= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+ - Moving a task to =NEXT= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+ - Moving a task to =DONE= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED" ("CANCELLED" . t))
+                ("WAITING" ("WAITING" . t))
+                ("HOLD" ("WAITING") ("HOLD" . t))
+                (done ("WAITING") ("HOLD"))
+                ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+#+END_SRC
+** =org-agenda=
+
+*** Files to scan for agenda views
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files '("~/Dropbox/Org/organizer/collection_bucket.org"
+                           "~/Dropbox/Org/organizer/next_actions.org"
+                           "~/Dropbox/Org/organizer/projects.org"
+                           "~/Dropbox/Org/organizer/someday_maybe.org"
+                           "~/Dropbox/Org/organizer/waiting.org"))
+#+END_SRC
+** =org-refile=
+
+Include current file and any file contributing to the agenda upto 9 levels deep in
+=org-refile= targets
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 1)))
+#+END_SRC
+
+Allow refile to create parent tasks with confirmation
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
+#+END_SRC
+
+Logging
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-refile t)
 #+END_SRC
 * Utility functions
 ** Insert current date and time
