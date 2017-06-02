@@ -759,7 +759,7 @@ A Doon inspired theme for emacs
   ;;
 
   (def-modeline! main
-    (bar matches " " buffer-info "  %l:%c %p  " selection-info)
+    (bar matches " " buffer-project buffer-info "  %l:%c %p  " selection-info)
     (buffer-encoding vcs major-mode flycheck))
 
   (def-modeline! eldoc
@@ -1176,7 +1176,7 @@ Enable smartparens
       "* %?\n %T")
      ("cp" "Purchase" entry (file+headline gtd-collection-bucket "Purchase")
       "* Buy %^{Buy}\n %T" :immediate-finish t)
-     ("ct" "TV series" entry (file+headline gtd-collection-bucket "TV series")
+     ("ct" "TV series/Anime" entry (file+headline gtd-collection-bucket "TV series/Anime")
       "* Watch %^{Watch}\n %T" :immediate-finish t)
      ("cv" "Videos" entry (file+headline gtd-collection-bucket "Videos")
         "* [[%^{Link}][%^{Description}]]\n %T" :immediate-finish t)
