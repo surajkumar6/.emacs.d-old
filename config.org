@@ -1480,3 +1480,123 @@ Multiple cursors like Sublime Text
   (global-set-key (kbd "C-r") (lambda () (interactive) (recenter-top-bottom 0)))
 
 #+END_SRC
+* Test
+#+BEGIN_SRC emacs-lisp
+  (use-package persp-mode
+    :ensure t
+    :demand t
+    :config
+    (setq persp-autokill-buffer-on-remove 'kill-weak
+          persp-nil-name "nil"
+          persp-nil-hidden t
+          persp-auto-save-fname "autosave"
+          persp-save-dir (concat "~/.emacs.d/" "workspaces/")
+          persp-set-last-persp-for-new-frames nil
+          persp-switch-to-added-buffer nil
+          persp-remove-buffers-from-nil-persp-behaviour nil
+          ;; Don't restore winconf on new frames
+          persp-init-frame-behaviour t
+          persp-init-new-frame-behaviour-override 'auto-temp
+          ;; Don't auto-load on startup
+          persp-auto-resume-time -1
+          ;; auto-save on kill
+          persp-auto-save-opt 1)
+
+    ;;Utils
+    ;;;###autoload
+  (defvar doom-fallback-buffer "*scratch*"
+    "The name of the buffer to fall back to if no other buffers exist (will create
+  it if it doesn't exist).")
+
+  ;;;###autoload
+  (defvar doom-real-buffer-functions '()
+    "A list of functions that are run to determine if a buffer is real.")
+
+  ;;;###autoload
+  (defun doom-fallback-buffer ()
+    "Returns the fallback buffer, creating it if necessary. By default this is the
+  scratch buffer."
+    (get-buffer-create doom-fallback-buffer))
+
+  ;;;###autoload
+  (defun doom-buffer-list (&optional project-p)
+    "Get all buffers in the current project, in the current workspace.
+  If PROJECT-P is non-nil, get all buffers associated with the current project in
+  the current workspace."
+    (let ((buffers (if (and (featurep 'persp-mode) persp-mode)
+                       (persp-buffer-list-restricted)
+                     (buffer-list)))
+          (project-root (and project-p (projectile-project-root))))
+      (if project-root
+          (funcall (if (eq project-p 'not) #'cl-remove-if #'cl-remove-if-not)
+                   (lambda (b) (projectile-project-buffer-p b project-root))
+                   buffers)
+        buffers)))
+
+  ;;;###autoload
+  (defun doom-real-buffer-p (&optional buffer-or-name)
+    "Returns t if BUFFER-OR-NAME is a 'real' buffer. Real means it a) isn't a
+  popup window/buffer and b) isn't a special buffer."
+    (let ((buf (window-normalize-buffer buffer-or-name)))
+      (or (run-hook-with-args-until-success 'doom-real-buffer-functions buf)
+          (not (or (minibufferp buf)
+                   (string-match-p "^\\s-*\\*" (buffer-name buf)))))))
+
+  ;;;###autoload
+  (defun doom-real-buffers-list (&optional buffer-list)
+    "Get a list of all buffers (in the current workspace OR in BUFFER-LIST) that
+  `doom-real-buffer-p' returns non-nil for."
+    (cl-remove-if-not #'doom-real-buffer-p (or buffer-list (doom-buffer-list))))
+
+
+    (defun +workspaces|init (&rest _)
+      (unless persp-mode
+        (persp-mode +1))
+      ;; The default perspective persp-mode makes (defined by `persp-nil-name') is
+      ;; special and doesn't actually represent a real persp object, so buffers
+      ;; can't really be assigned to it, among other quirks. We create a *real*
+      ;; main workspace to fill this role.
+      (persp-add-new +workspaces-main)
+      ;; Switch to it if we aren't auto-loading the last session
+      (when (or (= persp-auto-resume-time -1)
+                (equal (safe-persp-name (get-current-persp)) persp-nil-name))
+        (persp-frame-switch +workspaces-main)))
+
+    (add-hook! 'after-init-hook
+      (if (display-graphic-p)
+          (+workspaces|init)
+        (add-hook 'after-make-frame-functions '+workspaces|init)))
+
+    (define-key persp-mode-map [remap delete-window] #'+workspace/close-window-or-workspace)
+
+    ;; Per-frame perspectives
+    (setq persp-init-new-frame-behaviour-override nil
+          persp-interactive-init-frame-behaviour-override
+          (lambda (frame &optional new-frame-p)
+            (select-frame frame)
+            (+workspace/new)
+            (set-frame-parameter frame 'assoc-persp (+workspace-current-name))))
+
+    (defun +workspaces*delete-frame-and-persp (frame)
+      "Delete workspace associated with current frame IF it has no real buffers."
+      (when (and (string= (or (frame-parameter frame 'assoc-persp) "") (+workspace-current-name))
+                 (not (delq (doom-fallback-buffer) (doom-real-buffers-list))))
+        (+workspace/delete persp-name)))
+    (add-hook 'delete-frame-functions #'+workspaces*delete-frame-and-persp)
+
+    (defun +workspaces*auto-add-buffer (buffer &rest _)
+      "Auto-associate buffers with perspectives upon opening them. Allows a
+  perspective-specific buffer list via `doom-buffer-list'."
+      (when (and persp-mode
+                 (not persp-temporarily-display-buffer)
+                 (doom-real-buffer-p buffer))
+        (persp-add-buffer buffer (get-current-persp) nil)
+        (redisplay)))
+    (advice-add #'switch-to-buffer :after #'+workspaces*auto-add-buffer)
+    (advice-add #'display-buffer   :after #'+workspaces*auto-add-buffer)
+
+    (defun doom|new-workspace-on-project-change ()
+      "Create a new workspace when switching project with projectile."
+      (+workspace-switch (projectile-project-name) t))
+    (add-hook 'projectile-before-switch-project-hook #'doom|new-workspace-on-project-change)
+#+END_SRC
