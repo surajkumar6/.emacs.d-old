@@ -51,6 +51,71 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
   (require 'diminish)
   (require 'bind-key)
 #+END_SRC
+* Workspaces
+
+#+BEGIN_SRC emacs-lisp
+  (use-package persp-mode
+    :ensure t
+    :config
+    (defface +workspace-tab-selected-face
+      '((((class color) (background light))
+         (:background "#333333" :foreground "#000000")) ;; FIXME
+        (((class color) (background dark))
+         (:background "#51afef" :foreground "#181e26")))
+      "The face for selected tabs displayed by `+workspace/display'"
+      :group 'doom)
+
+    (defface +workspace-tab-face
+      '((((class color) (background light))
+         (:background "#333333" :foreground "#000000")) ;; FIXME
+        (((type graphic) (class color) (background dark))
+         (:background "#23272e" :foreground "#5B6268"))
+        (((class color) (background dark))
+         (:background "#262626" :foreground "#525252")))
+      "The face for selected tabs displayed by `+workspace/display'"
+      :group 'doom)
+
+    (defun +workspace-list ()
+      "Retrieve a list of names of open workspaces (strings)."
+      (delete persp-nil-name (persp-names-current-frame-fast-ordered)))
+
+    (defun +workspace-current-name ()
+      "Get the name of the currently active workspace."
+      (safe-persp-name (get-current-persp)))
+
+    (defun +workspace--tabline (&optional names)
+      (let ((names (or names (+workspace-list)))
+            (current-name (+workspace-current-name))
+            (i 0))
+        (mapconcat
+         #'identity
+         (mapcar (lambda (it)
+                   (cl-incf i)
+                   (propertize (format " [%d] %s " i it)
+                               'face (if (equal current-name it)
+                                         '+workspace-tab-selected-face
+                                       '+workspace-tab-face)))
+                 names)
+         " ")))
+
+    (defun +workspace--message-body (message &optional  type)
+      (concat (+workspace--tabline)
+              (propertize " | " 'face 'font-lock-comment-face)
+              (propertize (format "%s" message)
+                          'face (pcase type
+                                  ('error 'error)
+                                  ('warn 'warning)
+                                  ('success 'success)
+                                  ('info 'font-lock-comment-face)))))
+    (defun +workspace/display ()
+    "Display a list of workspaces (like tabs) in the echo area."
+      (interactive)
+      (message "%s" (+workspace--tabline)))
+    (with-eval-after-load "persp-mode-autoloads"
+        (setq wg-morph-on nil) ;; switch off animation
+        (setq persp-autokill-buffer-on-remove 'kill-weak)
+        (add-hook 'after-init-hook #'(lambda () (persp-mode 1)))))
+#+END_SRC
 * Use sensible defaults
   Use [[https://github.com/surajkumar6/emacs-config/blob/master/resources/sensible-defaults.el][sensible-defaults.el]] for some basic settings
 
@@ -1478,5 +1543,5 @@ Multiple cursors like Sublime Text
 
   (global-set-key (kbd "C-s") 'save-buffer) ;;
   (global-set-key (kbd "C-r") (lambda () (interactive) (recenter-top-bottom 0)))
-
+  (setq persp-keymap-prefix (kbd "C-c w"))
 #+END_SRC
