@@ -233,6 +233,16 @@ A startup dashboard with widgets
     (setq leuven-scale-org-agenda-structure nil))
 #+END_SRC
 
+** Modeline
+
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (spaceline-spacemacs-theme))
+#+END_SRC
+
 * Set default font and configure font resizing
 I use Consolas
 
