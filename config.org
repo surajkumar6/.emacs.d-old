@@ -170,12 +170,6 @@ A set of useful functions. Source: [[https://github.com/emacsmirror/emacswiki.or
   (global-hl-line-mode 1)
 #+END_SRC
 
-** Enable line numbers globally
-
-#+BEGIN_SRC emacs-lisp
-  (global-linum-mode t)
-#+END_SRC
-
 ** =rainbow-delimeters=
 Rainbow delimeters show matching braces with same color
 
@@ -308,6 +302,7 @@ Emacs bindings that stick around
     (setq projectile-completion-system 'ivy)
     (message "projectile loaded"))
 #+END_SRC
+
 ** =neotree=
 An emacs tree plugin
 
@@ -340,7 +335,6 @@ An emacs tree plugin
 #+END_SRC
 
 * Search and search completion
-
 ** =ivy=, =swiper= and =counsel=
 
 #+BEGIN_SRC emacs-lisp
@@ -362,6 +356,7 @@ An emacs tree plugin
            ("C-x l" . counsel-locate)
            ("C-c C-r" . ivy-resume)))
 #+END_SRC
+
 ** =counsel-projectile=
 
 #+BEGIN_SRC emacs-lisp
@@ -381,11 +376,13 @@ An emacs tree plugin
 #+BEGIN_SRC emacs-lisp
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
+
 *** Treat terms in camel case as seprate words globally
 
 #+BEGIN_SRC emacs-lisp
   (global-subword-mode 1)
 #+END_SRC
+
 *** =highlight-symbol=
 Automatic and manual symbol highlighting
 
@@ -398,6 +395,7 @@ Automatic and manual symbol highlighting
     (message "highlight-symbol loaded"))
 
 #+END_SRC
+
 *** =smartparens=
 Minor mode for Emacs that deals with parens pairs and tries to be smart about it
 
@@ -409,6 +407,7 @@ Minor mode for Emacs that deals with parens pairs and tries to be smart about it
     (require 'smartparens-config)
     (message "loaded smartparens"))
 #+END_SRC
+
 *** =dumb-jump=
 A 'jump to definition' package
 
@@ -421,6 +420,7 @@ A 'jump to definition' package
       (dumb-jump-mode)
       (message "dumb-jump loaded"))
 #+END_SRC
+
 ** Syntax checking
 =flycheck= provides on-the-fly syntax checking
 
@@ -432,6 +432,7 @@ A 'jump to definition' package
     (global-flycheck-mode)
     (message "flycheck loaded"))
 #+END_SRC
+
 ** Python
 *** =elpy=
 Emacs Python Development Environment
@@ -455,11 +456,13 @@ Emacs Python Development Environment
       (message "py-autopep8 loaded"))
       (message "elpy loaded"))
 #+END_SRC
+
 *** Indent 2 spaces
 
 #+BEGIN_SRC emacs-lisp
   (setq python-indent 2)
 #+END_SRC
+
 *** =python-django=
 Django project management package
 
@@ -467,6 +470,7 @@ Django project management package
   (add-to-list 'load-path "~/.emacs.d/resources/python-django.el")
   (require 'python-django)
 #+END_SRC
+
 ** Emacs Lisp
 *** =paredit=
 #+BEGIN_SRC emacs-lisp
@@ -510,6 +514,7 @@ Django project management package
   (global-set-key (kbd "C-c c") 'org-capture)
   (global-set-key (kbd "C-c b") 'org-iswitchb)
 #+END_SRC
+
 ** =org-mode= key bindings
 
 #+BEGIN_SRC emacs-lisp
@@ -517,14 +522,16 @@ Django project management package
   (bind-key "C-c t" 'org-show-todo-tree org-mode-map)
   (bind-key "C-c r" 'org-refile org-mode-map)
 #+END_SRC
+
 ** Display preferences
 Theme specific settings
 
 #+BEGIN_SRC emacs-lisp
 (setq org-fontify-whole-heading-line t
       org-fontify-done-headline t
-      org-fontify-quote-and-verse-blocks t)
+      org-fontify-qquote-and-verse-blocks t)
 #+END_SRC
+
 ** Source code editing
 
 Use syntax highlighting in source blocks while editing
@@ -550,6 +557,7 @@ Enable smartparens
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook #'smartparens-mode)
 #+END_SRC
+
 ** =org-drill=
 
 #+BEGIN_SRC emacs-lisp
@@ -561,6 +569,7 @@ Enable smartparens
     (setq org-drill-spaced-repetition-algorithm 'sm2)
     (message "org-drill loaded"))
 #+END_SRC
+
 ** =org-capture=
 
 #+BEGIN_SRC emacs-lisp
@@ -603,6 +612,7 @@ Enable smartparens
      ("v" "Vocabulary" entry (file+headline "~/Dropbox/Org/GRE/vocabulary.org" "Vocabulary")
       "* Word :drill:\n %^{word}\n** Meaning \n%^{meaning}")))
 #+END_SRC
+
 ** =org-journal=
 
 #+BEGIN_SRC emacs-lisp
@@ -612,30 +622,22 @@ Enable smartparens
     (setq org-journal-dir "~/Dropbox/Org/journal/")
     (setq org-journal-date-format "%A, %d-%B-%Y"))
 #+END_SRC
-** Tasks and states
 
+** Tasks and states
 *** Todo Keywords and keyword faces
 
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
         (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                 (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-
-  (setq org-todo-keyword-faces
-        (quote (("TODO" :foreground "red" :weight bold)
-                ("NEXT" :foreground "blue" :weight bold)
-                ("DONE" :foreground "forest green" :weight bold)
-                ("WAITING" :foreground "orange" :weight bold)
-                ("HOLD" :foreground "magenta" :weight bold)
-                ("CANCELLED" :foreground "forest green" :weight bold)
-                ("MEETING" :foreground "forest green" :weight bold)
-                ("PHONE" :foreground "forest green" :weight bold))))
 #+END_SRC
+
 *** Fast todo selection
 
 #+BEGIN_SRC emacs-lisp
   (setq org-use-fast-todo-selection t)
 #+END_SRC
+
 *** Skipping processing
 
 This setting allows changing todo states with S-left and S-right skipping all of the normal processing when entering or leaving a todo state. This cycles through the todo states but skips setting timestamps and entering notes.
@@ -643,6 +645,7 @@ This setting allows changing todo states with S-left and S-right skipping all of
 #+BEGIN_SRC emacs-lisp
   (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 #+END_SRC
+
 *** Todo state triggers
 
 Used to automatically assign tags to tasks based on state changes.
@@ -665,6 +668,7 @@ Following are the rules:
                 ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 #+END_SRC
+
 ** =org-agenda=
 
 *** Files to scan for agenda views
@@ -676,6 +680,7 @@ Following are the rules:
                            "~/Dropbox/Org/organizer/someday_maybe.org"
                            "~/Dropbox/Org/organizer/waiting.org"))
 #+END_SRC
+
 ** =org-refile=
 
 Include current file and any file contributing to the agenda upto 9 levels deep in
@@ -722,6 +727,7 @@ Logging
   (global-set-key (kbd "C-x C-d") 'insert-current-date-time)
   (global-set-key (kbd "C-x C-t") 'insert-current-time)
 #+END_SRC
+
 ** Splitting windows
 
 #+BEGIN_SRC emacs-lisp
@@ -745,37 +751,44 @@ Logging
 #+BEGIN_SRC emacs-lisp
   (visual-line-mode t)
 #+END_SRC
+
 ** Always kill current buffer
 
 #+BEGIN_SRC emacs-lisp
  (substitute-key-definition 'kill-buffer 'kill-buffer-and-its-windows global-map)
 #+END_SRC
+
 ** =company-mode= settings
 *** Use =company-mode= globally
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
+
 *** Set idle-delay
 
 #+BEGIN_SRC emacs-lisp
   (setq company-idle-delay 0)
 #+END_SRC
+
 *** Set minimum prefix length
 
 #+BEGIN_SRC emacs-lisp
   (setq company-minimum-prefix-length 3)
 #+END_SRC
+
 *** Show numbers
 
 #+BEGIN_SRC emacs-lisp
   (setq company-show-numbers t)
 #+END_SRC
+
 ** Always indent with spaces
 
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+END_SRC
+
 ** =multiple cursors=
 Multiple cursors like Sublime Text
 
@@ -790,6 +803,7 @@ Multiple cursors like Sublime Text
            ("C-<" . mc/mark-previous-like-this)
            ("C-c C-<" . mc/mark-all-like-this)))
 #+END_SRC
+
 ** line editing
 *** Copying curent line
 
@@ -807,6 +821,7 @@ Multiple cursors like Sublime Text
         (beginning-of-line 2))
   (global-set-key (kbd "C-S-C") 'quick-copy-line)
 #+END_SRC
+
 *** Cutting current line
 
 #+BEGIN_SRC emacs-lisp
@@ -823,6 +838,7 @@ Multiple cursors like Sublime Text
     (setq this-command 'quick-cut-line))
   (global-set-key (kbd "C-S-D") 'quick-cut-line)
 #+END_SRC
+
 *** Moving lines
 
 #+BEGIN_SRC emacs-lisp
@@ -842,6 +858,7 @@ Multiple cursors like Sublime Text
   (global-set-key (kbd "C-S-K") 'move-line-down)
   (global-set-key (kbd "C-S-I") 'move-line-up)
 #+END_SRC
+
 ** Smooth scrolling
 
 #+BEGIN_SRC emacs-lisp
@@ -854,6 +871,7 @@ Multiple cursors like Sublime Text
   (setq mouse-wheel-follow-mouse 't)
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
 #+END_SRC
+
 ** Easy navigation
 
 #+BEGIN_SRC emacs-lisp
